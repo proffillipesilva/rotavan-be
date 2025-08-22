@@ -1,7 +1,14 @@
 package br.edu.fiec.RotaVan.services;
 
-import org.springframework.stereotype.Service;
+import br.edu.fiec.RotaVan.models.Motoristas;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-@Service
 public interface MotoristasService {
+    List<Motoristas> findAll();
+    Optional<Motoristas> findById(UUID id);
+    Motoristas save(Motoristas motorista);
+    Optional<Motoristas> update(UUID id, Motoristas motoristaDetails);
+    boolean deleteById(UUID id);
 }
