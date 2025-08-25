@@ -1,0 +1,424 @@
+openapi: 3.0.3
+info:
+  title: API RotaVan
+  description: API para gestão de transporte escolar, incluindo cadastro de responsáveis, motoristas e escolas.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor de Desenvolvimento Local
+
+tags:
+  - name: Responsaveis
+    description: Operações relacionadas aos responsáveis pelas crianças.
+  - name: Motoristas
+    description: Operações relacionadas aos motoristas das vans.
+  - name: Escolas
+    description: Operações relacionadas às escolas.
+
+paths:
+  /responsaveis:
+    get:
+      tags:
+        - Responsaveis
+      summary: Lista todos os responsáveis
+      operationId: listarResponsaveis
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de responsáveis
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Responsaveis'
+    post:
+      tags:
+        - Responsaveis
+      summary: Cria um novo responsável
+      operationId: criarResponsavel
+      requestBody:
+        description: Objeto do responsável a ser criado
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsaveisInput'
+      responses:
+        '201':
+          description: Criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Responsaveis'
+        '400':
+          description: Requisição inválida
+
+  /responsaveis/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID do responsável
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Responsaveis
+      summary: Busca um responsável pelo ID
+      operationId: buscarResponsavelPorId
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Responsaveis'
+        '404':
+          description: Responsável não encontrado
+    put:
+      tags:
+        - Responsaveis
+      summary: Atualiza um responsável existente
+      operationId: atualizarResponsavel
+      requestBody:
+        description: Objeto do responsável com os dados atualizados
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsaveisInput'
+      responses:
+        '200':
+          description: Atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Responsaveis'
+        '404':
+          description: Responsável não encontrado
+    delete:
+      tags:
+        - Responsaveis
+      summary: Apaga um responsável
+      operationId: apagarResponsavel
+      responses:
+        '204':
+          description: Apagado com sucesso (Sem conteúdo)
+        '404':
+          description: Responsável não encontrado
+
+  /motoristas:
+    get:
+      tags:
+        - Motoristas
+      summary: Lista todos os motoristas
+      operationId: listarMotoristas
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de motoristas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Motoristas'
+    post:
+      tags:
+        - Motoristas
+      summary: Cria um novo motorista
+      operationId: criarMotorista
+      requestBody:
+        description: Objeto do motorista a ser criado
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotoristasInput'
+      responses:
+        '201':
+          description: Criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Motoristas'
+        '400':
+          description: Requisição inválida
+
+  /motoristas/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID do motorista
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Motoristas
+      summary: Busca um motorista pelo ID
+      operationId: buscarMotoristaPorId
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Motoristas'
+        '404':
+          description: Motorista não encontrado
+    put:
+      tags:
+        - Motoristas
+      summary: Atualiza um motorista existente
+      operationId: atualizarMotorista
+      requestBody:
+        description: Objeto do motorista com os dados atualizados
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotoristasInput'
+      responses:
+        '200':
+          description: Atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Motoristas'
+        '404':
+          description: Motorista não encontrado
+    delete:
+      tags:
+        - Motoristas
+      summary: Apaga um motorista
+      operationId: apagarMotorista
+      responses:
+        '204':
+          description: Apagado com sucesso (Sem conteúdo)
+        '404':
+          description: Motorista não encontrado
+
+  /escolas:
+    get:
+      tags:
+        - Escolas
+      summary: Lista todas as escolas
+      operationId: listarEscolas
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de escolas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Escolas'
+    post:
+      tags:
+        - Escolas
+      summary: Cria uma nova escola
+      operationId: criarEscola
+      requestBody:
+        description: Objeto da escola a ser criada
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscolasInput'
+      responses:
+        '201':
+          description: Criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escolas'
+        '400':
+          description: Requisição inválida
+
+  /escolas/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID da escola
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Escolas
+      summary: Busca uma escola pelo ID
+      operationId: buscarEscolaPorId
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escolas'
+        '404':
+          description: Escola não encontrada
+    put:
+      tags:
+        - Escolas
+      summary: Atualiza uma escola existente
+      operationId: atualizarEscola
+      requestBody:
+        description: Objeto da escola com os dados atualizados
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscolasInput'
+      responses:
+        '200':
+          description: Atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escolas'
+        '404':
+          description: Escola não encontrada
+    delete:
+      tags:
+        - Escolas
+      summary: Apaga uma escola
+      operationId: apagarEscola
+      responses:
+        '204':
+          description: Apagada com sucesso (Sem conteúdo)
+        '404':
+          description: Escola não encontrada
+
+components:
+  schemas:
+    Responsaveis:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+        nomeResponsavel:
+          type: string
+        cpfResponsavel:
+          type: string
+        enderecoCasa:
+          type: string
+        nomeCrianca:
+          type: string
+        enderecoEscola:
+          type: string
+    ResponsaveisInput:
+      type: object
+      required:
+        - email
+        - password
+        - nomeResponsavel
+        - cpfResponsavel
+        - enderecoCasa
+        - nomeCrianca
+        - enderecoEscola
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          writeOnly: true
+        nomeResponsavel:
+          type: string
+        cpfResponsavel:
+          type: string
+        enderecoCasa:
+          type: string
+        nomeCrianca:
+          type: string
+        enderecoEscola:
+          type: string
+
+    Motoristas:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+        nomeMotorista:
+          type: string
+        cnh:
+          type: integer
+          format: int64
+        cpf:
+          type: integer
+          format: int64
+        placaVeiculo:
+          type: string
+    MotoristasInput:
+      type: object
+      required:
+        - email
+        - password
+        - nomeMotorista
+        - cnh
+        - cpf
+        - placaVeiculo
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          writeOnly: true
+        nomeMotorista:
+          type: string
+        cnh:
+          type: integer
+          format: int64
+        cpf:
+          type: integer
+          format: int64
+        placaVeiculo:
+          type: string
+
+    Escolas:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        nome:
+          type: string
+        cnpj:
+          type: string
+        endereco:
+          type: string
+        telefone:
+          type: string
+    EscolasInput:
+      type: object
+      required:
+        - nome
+        - cnpj
+        - endereco
+      properties:
+        nome:
+          type: string
+        cnpj:
+          type: string
+        endereco:
+          type: string
+        telefone:
+          type: string

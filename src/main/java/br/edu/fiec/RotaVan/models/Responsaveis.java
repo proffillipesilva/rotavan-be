@@ -2,6 +2,7 @@ package br.edu.fiec.RotaVan.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.util.UUID;
 
 @Entity
@@ -22,9 +23,8 @@ public class Responsaveis {
     @Column(nullable = false)
     String nomeResponsavel;
 
-    // ALTERAÇÃO AQUI: De Long para String
     @Column(nullable = false, unique = true) // Adicionar unique = true é uma boa prática para CPF
-            String cpfResponsavel;
+    String cpfResponsavel;
 
     @Column(nullable = false)
     String enderecoCasa;
