@@ -1,4 +1,4 @@
-package br.edu.fiec.RotaVan.models;
+package br.edu.fiec.RotaVan.features.user.models;
 
 import jakarta.persistence.*;
 import lombok.Data;

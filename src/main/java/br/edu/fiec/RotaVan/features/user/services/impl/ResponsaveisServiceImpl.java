@@ -1,9 +1,12 @@
-package br.edu.fiec.RotaVan.services.impl;
+package br.edu.fiec.RotaVan.features.user.services.impl;
 
-import br.edu.fiec.RotaVan.models.Responsaveis;
-import br.edu.fiec.RotaVan.repositories.ResponsaveisRepository;
-import br.edu.fiec.RotaVan.services.ResponsaveisService;
+import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
+import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
+import br.edu.fiec.RotaVan.features.user.services.ResponsaveisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.UUID;
 
 
 @Service
-public class ResponsaveisServiceImpl implements ResponsaveisService {
+public class ResponsaveisServiceImpl implements ResponsaveisService, UserDetailsService {
 
 
     private final ResponsaveisRepository responsaveisRepository;
@@ -35,5 +38,10 @@ public class ResponsaveisServiceImpl implements ResponsaveisService {
     @Override
     public Optional<Responsaveis> findById(UUID id) {
         return responsaveisRepository.findById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return (UserDetails) responsaveisRepository.findByEmail(email).orElseThrow();
     }
 }

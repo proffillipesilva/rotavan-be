@@ -1,6 +1,6 @@
-package br.edu.fiec.RotaVan.services;
+package br.edu.fiec.RotaVan.features.user.services;
 
-import br.edu.fiec.RotaVan.models.Motoristas;
+import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

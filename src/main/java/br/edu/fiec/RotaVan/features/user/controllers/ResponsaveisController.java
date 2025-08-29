@@ -1,7 +1,7 @@
-package br.edu.fiec.RotaVan.controllers;
+package br.edu.fiec.RotaVan.features.user.controllers;
 
-import br.edu.fiec.RotaVan.models.Responsaveis;
-import br.edu.fiec.RotaVan.services.ResponsaveisService;
+import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
+import br.edu.fiec.RotaVan.features.user.services.ResponsaveisService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity; // Importação recomendada para mais controlo
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.UUID;
 // Define um caminho (URL) base para todos os métodos nesta classe.
 // Ex: http://localhost:8080/responsaveis
 @RestController
-@RequestMapping("/responsaveis")
+@RequestMapping("/v1/api/responsaveis")
 public class ResponsaveisController {
 
     private final ResponsaveisService responsaveisService;

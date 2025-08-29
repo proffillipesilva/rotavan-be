@@ -1,4 +1,5 @@
-package br.edu.fiec.RotaVan.models;
+package br.edu.fiec.RotaVan.features.user.models;
+
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -7,7 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Data
-public class Responsaveis {
+public class Motoristas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -21,17 +22,15 @@ public class Responsaveis {
     private String password;
 
     @Column(nullable = false)
-    String nomeResponsavel;
-
-    @Column(nullable = false, unique = true) // Adicionar unique = true é uma boa prática para CPF
-    String cpfResponsavel;
+    String nomeMotorista;
 
     @Column(nullable = false)
-    String enderecoCasa;
+    Long cnh;
 
     @Column(nullable = false)
-    String nomeCrianca;
+    Long cpf;
 
     @Column(nullable = false)
-    String enderecoEscola;
+    String placaVeiculo;
+
 }

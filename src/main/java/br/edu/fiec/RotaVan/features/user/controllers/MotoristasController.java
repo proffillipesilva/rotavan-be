@@ -1,7 +1,7 @@
-package br.edu.fiec.RotaVan.controllers;
+package br.edu.fiec.RotaVan.features.user.controllers;
 
-import br.edu.fiec.RotaVan.models.Motoristas;
-import br.edu.fiec.RotaVan.services.MotoristasService;
+import br.edu.fiec.RotaVan.features.user.models.Motoristas;
+import br.edu.fiec.RotaVan.features.user.services.MotoristasService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

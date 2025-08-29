@@ -1,6 +1,6 @@
-package br.edu.fiec.RotaVan.repositories;
+package br.edu.fiec.RotaVan.features.user.repositories;
 
-import br.edu.fiec.RotaVan.models.Escolas;
+import br.edu.fiec.RotaVan.features.user.models.Escolas;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

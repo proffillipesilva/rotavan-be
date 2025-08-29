@@ -1,7 +1,8 @@
-package br.edu.fiec.RotaVan.services;
+package br.edu.fiec.RotaVan.features.user.services.impl;
 
-import br.edu.fiec.RotaVan.models.Escolas;
-import br.edu.fiec.RotaVan.repositories.EscolasRepository;
+import br.edu.fiec.RotaVan.features.user.models.Escolas;
+import br.edu.fiec.RotaVan.features.user.repositories.EscolasRepository;
+import br.edu.fiec.RotaVan.features.user.services.EscolasService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

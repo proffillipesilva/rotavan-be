@@ -1,8 +1,8 @@
-package br.edu.fiec.RotaVan.services.impl;
+package br.edu.fiec.RotaVan.features.user.services.impl;
 
-import br.edu.fiec.RotaVan.models.Motoristas;
-import br.edu.fiec.RotaVan.repositories.MotoristasRepository;
-import br.edu.fiec.RotaVan.services.MotoristasService;
+import br.edu.fiec.RotaVan.features.user.models.Motoristas;
+import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
+import br.edu.fiec.RotaVan.features.user.services.MotoristasService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
