@@ -1,67 +1,80 @@
-package br.edu.fiec.RotaVan.features.user.controllers;
+package br.edu.fiec.RotaVan.features.user.controllers; // Verifique se o pacote está correto
 
+import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 import br.edu.fiec.RotaVan.features.user.services.ResponsaveisService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity; // Importação recomendada para mais controlo
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-// Define um caminho (URL) base para todos os métodos nesta classe.
-// Ex: http://localhost:8080/responsaveis
 @RestController
-@RequestMapping("/v1/api/responsaveis")
+@RequestMapping("/responsaveis")
 public class ResponsaveisController {
 
     private final ResponsaveisService responsaveisService;
 
-    // Injeção de dependência via construtor (forma recomendada)
     public ResponsaveisController(ResponsaveisService responsaveisService) {
         this.responsaveisService = responsaveisService;
     }
 
     /**
-     * Endpoint para CRIAR um novo responsável.
-     * Acede através de: POST http://localhost:8080/responsaveis
-     * O corpo do pedido deve conter um JSON com os dados do novo responsável.
-     * @param novoResponsavel O objeto Responsaveis vindo do corpo do pedido (JSON).
-     * @return O responsável que foi criado e guardado na base de dados.
+     * Endpoint para CRIAR um novo responsável, incluindo a sua lista de filhos.
+     * URL: POST http://localhost:8080/responsaveis
      */
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Responsaveis criaResponsavel(@RequestBody Responsaveis novoResponsavel) {
-        return this.responsaveisService.criaResponsavel(novoResponsavel);
+    public ResponseEntity<Responsaveis> createResponsavel(@RequestBody Responsaveis responsavel) {
+        // O código Java não muda, mas o JSON enviado no Postman agora deve conter a lista de crianças.
+        Responsaveis savedResponsavel = responsaveisService.criaResponsavel(responsavel);
+        return new ResponseEntity<>(savedResponsavel, HttpStatus.CREATED);
     }
 
     /**
-     * Endpoint para LISTAR TODOS os responsáveis.
-     * Acede através de: GET http://localhost:8080/responsaveis
-     * @return Uma lista com todos os responsáveis encontrados.
+     * Endpoint para ADICIONAR uma nova criança a um responsável EXISTENTE.
+     * URL: POST http://localhost:8080/responsaveis/{responsavelId}/criancas
+     */
+    @PostMapping("/{responsavelId}/criancas")
+    public ResponseEntity<Crianca> adicionarCrianca(
+            @PathVariable UUID responsavelId,
+            @RequestBody Crianca novaCrianca) {
+
+        return responsaveisService.adicionarCrianca(responsavelId, novaCrianca)
+                .map(crianca -> new ResponseEntity<>(crianca, HttpStatus.CREATED))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Endpoint para LISTAR TODOS os responsáveis e suas crianças.
+     * URL: GET http://localhost:8080/responsaveis
      */
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<Responsaveis> listarTodos() {
-        return this.responsaveisService.findAll(); // Supondo que o teu serviço tem um método findAll()
+    public ResponseEntity<List<Responsaveis>> getAllResponsaveis() {
+        return ResponseEntity.ok(responsaveisService.findAll());
     }
 
     /**
      * Endpoint para BUSCAR UM responsável pelo seu ID.
-     * Acede através de: GET http://localhost:8080/responsaveis/1 (onde 1 é o ID)
-     * @param id O ID do responsável a ser procurado, vindo do URL.
-     * @return O responsável encontrado ou um status 404 (Not Found) se não existir.
+     * URL: GET http://localhost:8080/responsaveis/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Responsaveis> getResponsavelPorId(@PathVariable UUID id) {
-        // Optional é uma boa prática para lidar com a possibilidade de não encontrar o objeto
-        Optional<Responsaveis> responsavel = this.responsaveisService.findById(id); // Supondo que o teu serviço tem um método findById()
-
-        if (responsavel.isPresent()) {
-            return ResponseEntity.ok(responsavel.get()); // Retorna 200 OK com o objeto
-        } else {
-            return ResponseEntity.notFound().build(); // Retorna 404 Not Found
-        }
+    public ResponseEntity<Responsaveis> getResponsavelById(@PathVariable UUID id) {
+        return responsaveisService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
+
+    /**
+     * Endpoint para ATUALIZAR os dados de um responsável (não afeta a lista de filhos).
+     * URL: PUT http://localhost:8080/responsaveis/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Responsaveis> updateResponsavel(@PathVariable UUID id, @RequestBody Responsaveis responsavelDetails) {
+        return responsaveisService.update(id, responsavelDetails)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // NOTA: Um endpoint de DELETE ainda precisaria ser criado, se necessário.
 }

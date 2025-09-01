@@ -1,5 +1,6 @@
 package br.edu.fiec.RotaVan.features.user.services;
 
+import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 
 import java.util.List;
@@ -32,4 +33,10 @@ public interface ResponsaveisService {
      * @return Um Optional contendo o responsável se encontrado, ou vazio se não.
      */
     Optional<Responsaveis> findById(UUID id);
+
+    // Em ResponsaveisService.java
+    Optional<Crianca> adicionarCrianca(UUID responsavelId, Crianca novaCrianca);
+
+    // Em ResponsaveisService.java
+    Optional<Responsaveis> update(UUID id, Responsaveis responsavelDetails);
 }

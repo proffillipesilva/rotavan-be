@@ -27,25 +27,35 @@ public class Responsaveis implements UserDetails {
     @Column(nullable = false)
     String nomeResponsavel;
 
-    @Column(nullable = false, unique = true) // Adicionar unique = true é uma boa prática para CPF
+    @Column(nullable = false, unique = true)
     String cpfResponsavel;
 
     @Column(nullable = false)
     String enderecoCasa;
 
-    @Column(nullable = false)
-    String nomeCrianca;
+    /**
+     * ALTERAÇÃO 1: Relacionamento Um-para-Muitos.
+     * Um responsável pode ter muitas crianças.
+     * - cascade = CascadeType.ALL: Salva ou apaga as crianças junto com o responsável.
+     * - orphanRemoval = true: Remove crianças da base de dados se forem removidas da lista.
+     */
+    @OneToMany(mappedBy = "responsavel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Crianca> criancas;
 
-    @Column(nullable = false)
-    String enderecoEscola;
+
+    // MÉTODOS DA INTERFACE USERDETAILS //
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Por enquanto, não estamos a usar papéis (Roles), então retornamos uma lista vazia.
         return List.of();
     }
 
     @Override
     public String getUsername() {
+        // O Spring Security usará o email como "nome de usuário" para o login.
         return email;
     }
+
+
 }

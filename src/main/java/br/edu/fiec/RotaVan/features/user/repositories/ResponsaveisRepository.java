@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ResponsaveisRepository extends JpaRepository<Responsaveis, UUID> {
-    Optional<Object> findByEmail(String email);
+    Optional<Responsaveis> findByEmail(String email);
 }
