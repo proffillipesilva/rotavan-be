@@ -35,7 +35,7 @@ paths:
     post:
       tags:
         - Responsaveis
-      summary: Cria um novo responsável
+      summary: Cria um novo responsável com a sua lista de filhos
       operationId: criarResponsavel
       requestBody:
         description: Objeto do responsável a ser criado
@@ -80,7 +80,7 @@ paths:
     put:
       tags:
         - Responsaveis
-      summary: Atualiza um responsável existente
+      summary: Atualiza os dados de um responsável (não afeta os filhos)
       operationId: atualizarResponsavel
       requestBody:
         description: Objeto do responsável com os dados atualizados
@@ -106,6 +106,37 @@ paths:
       responses:
         '204':
           description: Apagado com sucesso (Sem conteúdo)
+        '404':
+          description: Responsável não encontrado
+
+  /responsaveis/{responsavelId}/criancas:
+    parameters:
+      - name: responsavelId
+        in: path
+        required: true
+        description: O ID do responsável ao qual a criança será adicionada
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - Responsaveis
+      summary: Adiciona uma nova criança a um responsável existente
+      operationId: adicionarCrianca
+      requestBody:
+        description: Objeto da nova criança a ser adicionada
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriancaInput'
+      responses:
+        '201':
+          description: Criança adicionada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Crianca'
         '404':
           description: Responsável não encontrado
 
@@ -311,10 +342,11 @@ components:
           type: string
         enderecoCasa:
           type: string
-        nomeCrianca:
-          type: string
-        enderecoEscola:
-          type: string
+        criancas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Crianca'
+          readOnly: true
     ResponsaveisInput:
       type: object
       required:
@@ -323,8 +355,6 @@ components:
         - nomeResponsavel
         - cpfResponsavel
         - enderecoCasa
-        - nomeCrianca
-        - enderecoEscola
       properties:
         email:
           type: string
@@ -339,10 +369,39 @@ components:
           type: string
         enderecoCasa:
           type: string
-        nomeCrianca:
+        criancas:
+          type: array
+          items:
+            $ref: '#/components/schemas/CriancaInput'
+
+    Crianca:
+      type: object
+      properties:
+        id:
           type: string
-        enderecoEscola:
+          format: uuid
+          readOnly: true
+        nome:
           type: string
+        escola:
+          $ref: '#/components/schemas/Escolas'
+    CriancaInput:
+      type: object
+      required:
+        - nome
+        - escola
+      properties:
+        nome:
+          type: string
+        escola:
+          type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: O ID da escola onde a criança estuda. A escola já deve existir.
 
     Motoristas:
       type: object
