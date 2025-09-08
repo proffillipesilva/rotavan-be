@@ -20,10 +20,7 @@ public class ResponsaveisController {
         this.responsaveisService = responsaveisService;
     }
 
-    /**
-     * Endpoint para CRIAR um novo responsável, incluindo a sua lista de filhos.
-     * URL: POST http://localhost:8080/responsaveis
-     */
+
     @PostMapping
     public ResponseEntity<Responsaveis> createResponsavel(@RequestBody Responsaveis responsavel) {
         // O código Java não muda, mas o JSON enviado no Postman agora deve conter a lista de crianças.
@@ -31,10 +28,7 @@ public class ResponsaveisController {
         return new ResponseEntity<>(savedResponsavel, HttpStatus.CREATED);
     }
 
-    /**
-     * Endpoint para ADICIONAR uma nova criança a um responsável EXISTENTE.
-     * URL: POST http://localhost:8080/responsaveis/{responsavelId}/criancas
-     */
+
     @PostMapping("/{responsavelId}/criancas")
     public ResponseEntity<Crianca> adicionarCrianca(
             @PathVariable UUID responsavelId,
@@ -45,19 +39,12 @@ public class ResponsaveisController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Endpoint para LISTAR TODOS os responsáveis e suas crianças.
-     * URL: GET http://localhost:8080/responsaveis
-     */
     @GetMapping
     public ResponseEntity<List<Responsaveis>> getAllResponsaveis() {
         return ResponseEntity.ok(responsaveisService.findAll());
     }
 
-    /**
-     * Endpoint para BUSCAR UM responsável pelo seu ID.
-     * URL: GET http://localhost:8080/responsaveis/{id}
-     */
+
     @GetMapping("/{id}")
     public ResponseEntity<Responsaveis> getResponsavelById(@PathVariable UUID id) {
         return responsaveisService.findById(id)
@@ -65,10 +52,7 @@ public class ResponsaveisController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Endpoint para ATUALIZAR os dados de um responsável (não afeta a lista de filhos).
-     * URL: PUT http://localhost:8080/responsaveis/{id}
-     */
+
     @PutMapping("/{id}")
     public ResponseEntity<Responsaveis> updateResponsavel(@PathVariable UUID id, @RequestBody Responsaveis responsavelDetails) {
         return responsaveisService.update(id, responsavelDetails)
@@ -76,5 +60,4 @@ public class ResponsaveisController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // NOTA: Um endpoint de DELETE ainda precisaria ser criado, se necessário.
 }

@@ -1,9 +1,8 @@
 package br.edu.fiec.RotaVan.features.user.models;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.util.UUID;
 
 @Entity
@@ -12,25 +11,25 @@ public class Motoristas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    // REMOVEMOS email e password
+
+    // ADICIONAMOS A LIGAÇÃO PARA O USUÁRIO
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnore
+    private User user;
 
     @Column(nullable = false)
-    private String password;
+    private String nomeMotorista;
 
     @Column(nullable = false)
-    String nomeMotorista;
+    private Long cnh;
 
     @Column(nullable = false)
-    Long cnh;
+    private Long cpf;
 
     @Column(nullable = false)
-    Long cpf;
-
-    @Column(nullable = false)
-    String placaVeiculo;
-
+    private String placaVeiculo;
 }

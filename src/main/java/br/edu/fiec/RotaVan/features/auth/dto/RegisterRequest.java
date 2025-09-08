@@ -1,6 +1,7 @@
 package br.edu.fiec.RotaVan.features.auth.dto;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class RegisterRequest {
@@ -8,8 +9,6 @@ public class RegisterRequest {
     private String email;
     private String password;
     private String cpfResponsavel;
-    private String endrecoCasa;
-    private String nomeCrianca;
-    // Opcionalmente, pode-se incluir o nível de acesso
-    // private UserLevel accessLevel;
+    private String enderecoCasa;
+    private List<CriancaRegisterDTO> criancas;
 }
