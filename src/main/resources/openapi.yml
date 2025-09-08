@@ -5,68 +5,100 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:5000
     description: Servidor de Desenvolvimento Local
 
 tags:
+  - name: Autenticação
+    description: Endpoints para registo e login de usuários.
   - name: Responsaveis
-    description: Operações relacionadas aos responsáveis pelas crianças.
+    description: Operações para gerir perfis de responsáveis.
   - name: Motoristas
-    description: Operações relacionadas aos motoristas das vans.
+    description: Operações para gerir perfis de motoristas.
   - name: Escolas
     description: Operações relacionadas às escolas.
 
+security:
+  - BearerAuth: []
+
 paths:
+  /v1/api/auth/register:
+    post:
+      tags:
+        - Autenticação
+      summary: Regista um novo usuário (Responsável) e retorna um token.
+      operationId: registrarResponsavel
+      security: []
+      requestBody:
+        description: Dados para o registo do novo Responsável.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registo bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Dados de registo inválidos.
+
+  /v1/api/auth/login:
+    post:
+      tags:
+        - Autenticação
+      summary: Autentica um usuário e retorna um token.
+      operationId: loginUsuario
+      security: []
+      requestBody:
+        description: Credenciais para login.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '403':
+          description: Email ou senha inválidos.
+
   /responsaveis:
     get:
       tags:
         - Responsaveis
-      summary: Lista todos os responsáveis
+      summary: Lista todos os perfis de responsáveis
       operationId: listarResponsaveis
       responses:
         '200':
-          description: Sucesso - Retorna a lista de responsáveis
+          description: Sucesso - Retorna a lista de perfis de responsáveis
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Responsaveis'
-    post:
-      tags:
-        - Responsaveis
-      summary: Cria um novo responsável com a sua lista de filhos
-      operationId: criarResponsavel
-      requestBody:
-        description: Objeto do responsável a ser criado
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResponsaveisInput'
-      responses:
-        '201':
-          description: Criado com sucesso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Responsaveis'
-        '400':
-          description: Requisição inválida
 
   /responsaveis/{id}:
     parameters:
       - name: id
         in: path
         required: true
-        description: ID do responsável
+        description: ID do perfil do responsável
         schema:
           type: string
           format: uuid
     get:
       tags:
         - Responsaveis
-      summary: Busca um responsável pelo ID
+      summary: Busca um perfil de responsável pelo ID
       operationId: buscarResponsavelPorId
       responses:
         '200':
@@ -76,19 +108,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Responsaveis'
         '404':
-          description: Responsável não encontrado
+          description: Perfil de Responsável não encontrado
     put:
       tags:
         - Responsaveis
-      summary: Atualiza os dados de um responsável (não afeta os filhos)
+      summary: Atualiza os dados de um perfil de responsável
       operationId: atualizarResponsavel
       requestBody:
-        description: Objeto do responsável com os dados atualizados
+        description: Objeto do responsável com os dados do perfil atualizados
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResponsaveisInput'
+              $ref: '#/components/schemas/ResponsaveisProfileInput'
       responses:
         '200':
           description: Atualizado com sucesso
@@ -97,31 +129,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Responsaveis'
         '404':
-          description: Responsável não encontrado
+          description: Perfil de Responsável não encontrado
     delete:
       tags:
         - Responsaveis
-      summary: Apaga um responsável
+      summary: Apaga um usuário e seu perfil de responsável
       operationId: apagarResponsavel
       responses:
         '204':
           description: Apagado com sucesso (Sem conteúdo)
         '404':
-          description: Responsável não encontrado
+          description: Perfil de Responsável não encontrado
 
   /responsaveis/{responsavelId}/criancas:
     parameters:
       - name: responsavelId
         in: path
         required: true
-        description: O ID do responsável ao qual a criança será adicionada
+        description: O ID do perfil do responsável ao qual a criança será adicionada
         schema:
           type: string
           format: uuid
     post:
       tags:
         - Responsaveis
-      summary: Adiciona uma nova criança a um responsável existente
+      summary: Adiciona uma nova criança a um perfil de responsável existente
       operationId: adicionarCrianca
       requestBody:
         description: Objeto da nova criança a ser adicionada
@@ -138,58 +170,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/Crianca'
         '404':
-          description: Responsável não encontrado
+          description: Perfil de Responsável não encontrado
 
   /motoristas:
     get:
       tags:
         - Motoristas
-      summary: Lista todos os motoristas
+      summary: Lista todos os perfis de motoristas
       operationId: listarMotoristas
       responses:
         '200':
-          description: Sucesso - Retorna a lista de motoristas
+          description: Sucesso - Retorna a lista de perfis de motoristas
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Motoristas'
-    post:
-      tags:
-        - Motoristas
-      summary: Cria um novo motorista
-      operationId: criarMotorista
-      requestBody:
-        description: Objeto do motorista a ser criado
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MotoristasInput'
-      responses:
-        '201':
-          description: Criado com sucesso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Motoristas'
-        '400':
-          description: Requisição inválida
 
   /motoristas/{id}:
     parameters:
       - name: id
         in: path
         required: true
-        description: ID do motorista
+        description: ID do perfil do motorista
         schema:
           type: string
           format: uuid
     get:
       tags:
         - Motoristas
-      summary: Busca um motorista pelo ID
+      summary: Busca um perfil de motorista pelo ID
       operationId: buscarMotoristaPorId
       responses:
         '200':
@@ -199,19 +210,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Motoristas'
         '404':
-          description: Motorista não encontrado
+          description: Perfil de Motorista não encontrado
     put:
       tags:
         - Motoristas
-      summary: Atualiza um motorista existente
+      summary: Atualiza os dados de um perfil de motorista
       operationId: atualizarMotorista
       requestBody:
-        description: Objeto do motorista com os dados atualizados
+        description: Objeto do motorista com os dados do perfil atualizados
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MotoristasInput'
+              $ref: '#/components/schemas/MotoristasProfileInput'
       responses:
         '200':
           description: Atualizado com sucesso
@@ -220,17 +231,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/Motoristas'
         '404':
-          description: Motorista não encontrado
+          description: Perfil de Motorista não encontrado
     delete:
       tags:
         - Motoristas
-      summary: Apaga um motorista
+      summary: Apaga um usuário e seu perfil de motorista
       operationId: apagarMotorista
       responses:
         '204':
           description: Apagado com sucesso (Sem conteúdo)
         '404':
-          description: Motorista não encontrado
+          description: Perfil de Motorista não encontrado
 
   /escolas:
     get:
@@ -325,29 +336,14 @@ paths:
           description: Escola não encontrada
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
-    Responsaveis:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        email:
-          type: string
-          format: email
-        nomeResponsavel:
-          type: string
-        cpfResponsavel:
-          type: string
-        enderecoCasa:
-          type: string
-        criancas:
-          type: array
-          items:
-            $ref: '#/components/schemas/Crianca'
-          readOnly: true
-    ResponsaveisInput:
+    RegisterRequest:
       type: object
       required:
         - email
@@ -362,7 +358,6 @@ components:
         password:
           type: string
           format: password
-          writeOnly: true
         nomeResponsavel:
           type: string
         cpfResponsavel:
@@ -372,7 +367,53 @@ components:
         criancas:
           type: array
           items:
-            $ref: '#/components/schemas/CriancaInput'
+            $ref: '#/components/schemas/CriancaRegisterDTO'
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+
+    Responsaveis:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        nomeResponsavel:
+          type: string
+        cpfResponsavel:
+          type: string
+        enderecoCasa:
+          type: string
+        criancas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Crianca'
+          readOnly: true
+
+    ResponsaveisProfileInput:
+      type: object
+      properties:
+        nomeResponsavel:
+          type: string
+        cpfResponsavel:
+          type: string
+        enderecoCasa:
+          type: string
 
     Crianca:
       type: object
@@ -402,6 +443,18 @@ components:
               type: string
               format: uuid
               description: O ID da escola onde a criança estuda. A escola já deve existir.
+    CriancaRegisterDTO:
+      type: object
+      required:
+        - nome
+        - escolaId
+      properties:
+        nome:
+          type: string
+        escolaId:
+          type: string
+          format: uuid
+          description: O ID da escola onde a criança estuda. A escola já deve existir.
 
     Motoristas:
       type: object
@@ -410,9 +463,6 @@ components:
           type: string
           format: uuid
           readOnly: true
-        email:
-          type: string
-          format: email
         nomeMotorista:
           type: string
         cnh:
@@ -423,23 +473,9 @@ components:
           format: int64
         placaVeiculo:
           type: string
-    MotoristasInput:
+    MotoristasProfileInput:
       type: object
-      required:
-        - email
-        - password
-        - nomeMotorista
-        - cnh
-        - cpf
-        - placaVeiculo
       properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
-          writeOnly: true
         nomeMotorista:
           type: string
         cnh:

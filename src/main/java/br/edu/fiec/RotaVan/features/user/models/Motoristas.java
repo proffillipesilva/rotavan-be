@@ -13,9 +13,6 @@ public class Motoristas {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    // REMOVEMOS email e password
-
-    // ADICIONAMOS A LIGAÇÃO PARA O USUÁRIO
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnore

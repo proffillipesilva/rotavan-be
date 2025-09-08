@@ -8,5 +8,4 @@ import java.util.UUID;
 
 @Repository
 public interface MotoristasRepository extends JpaRepository<Motoristas, UUID> {
-    // JpaRepository já fornece métodos como save(), findAll(), findById(), deleteById(), etc.
 }

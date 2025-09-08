@@ -14,12 +14,9 @@ public class Responsaveis {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    // REMOVEMOS email e password
-
-    // ADICIONAMOS A LIGAÇÃO PARA O USUÁRIO
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonIgnore // Evita loops infinitos na serialização
+    @JsonIgnore
     private User user;
 
     @Column(nullable = false)
@@ -34,5 +31,4 @@ public class Responsaveis {
     @OneToMany(mappedBy = "responsavel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Crianca> criancas;
 
-    // REMOVEMOS toda a implementação de UserDetails
 }
