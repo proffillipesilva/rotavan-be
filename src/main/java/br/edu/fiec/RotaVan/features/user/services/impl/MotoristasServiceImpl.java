@@ -30,6 +30,7 @@ public class MotoristasServiceImpl implements MotoristasService {
 
     @Override
     public Motoristas save(Motoristas motorista) {
+        // Este método será ajustado quando criarmos o registo de motoristas
         return motoristasRepository.save(motorista);
     }
 
@@ -37,8 +38,7 @@ public class MotoristasServiceImpl implements MotoristasService {
     public Optional<Motoristas> update(UUID id, Motoristas motoristaDetails) {
         return motoristasRepository.findById(id)
                 .map(existingMotorista -> {
-                    existingMotorista.setEmail(motoristaDetails.getEmail());
-                    existingMotorista.setPassword(motoristaDetails.getPassword()); // Atenção com a senha!
+                    // ATUALIZAÇÃO AQUI: Removemos as linhas de email e password
                     existingMotorista.setNomeMotorista(motoristaDetails.getNomeMotorista());
                     existingMotorista.setCnh(motoristaDetails.getCnh());
                     existingMotorista.setCpf(motoristaDetails.getCpf());
