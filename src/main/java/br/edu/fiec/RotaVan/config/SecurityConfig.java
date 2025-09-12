@@ -44,7 +44,7 @@ public class SecurityConfig  {
                 })
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/v1/api/auth/**", "/v1/api/vans/**").permitAll()
+                        .requestMatchers("/v1/api/auth/**", "/v1/api/vans/**", "/escolas/**").permitAll()
                         .anyRequest().authenticated()
                 ).sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
