@@ -1,5 +1,6 @@
 package br.edu.fiec.RotaVan.features.user.services.impl;
 
+import br.edu.fiec.RotaVan.features.user.models.User; // Importar o modelo User
 import br.edu.fiec.RotaVan.features.user.repositories.UserRepository;
 import br.edu.fiec.RotaVan.features.user.services.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,5 +26,11 @@ public class UserServiceImpl implements UserService {
                         .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
             }
         };
+    }
+
+
+    @Override
+    public void save(User user) {
+        userRepository.save(user);
     }
 }
