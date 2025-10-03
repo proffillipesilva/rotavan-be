@@ -4,6 +4,7 @@ import br.edu.fiec.RotaVan.features.auth.dto.LoginRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.LoginResponse;
 import br.edu.fiec.RotaVan.features.auth.dto.RegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.services.AuthenticationService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<LoginResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
@@ -31,4 +32,5 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authenticationService.login(request));
     }
+
 }

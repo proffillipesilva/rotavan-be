@@ -29,6 +29,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column
+    private String picture;
+
     // Relacionamento Um-para-Um com o perfil do Responsável
     // cascade = CascadeType.ALL: Se o User for apagado, o perfil também é.
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
