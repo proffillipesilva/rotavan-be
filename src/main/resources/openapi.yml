@@ -155,6 +155,24 @@ paths:
         '401':
           description: Não autorizado.
 
+  /v1/api/users/me:
+    get:
+      tags:
+        - Utilizadores
+      summary: Obtém as informações do perfil do utilizador autenticado.
+      operationId: getMe
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso. Retorna os dados do perfil do utilizador.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyUserResponse'
+        '401':
+          description: Não autorizado.
+
   # ===============================================================
   # ENDPOINTS DE IMAGENS
   # ===============================================================
@@ -190,17 +208,19 @@ paths:
           description: Imagem não encontrada.
 
   # ===============================================================
-  # ENDPOINTS DE RESPONSÁVEIS, MOTORISTAS E ESCOLAS
+  # ENDPOINTS DE RESPONSÁVEIS
   # ===============================================================
   /responsaveis:
     get:
       tags:
         - Responsaveis
-      summary: Lista todos os perfis de responsáveis
+      summary: Lista todos os perfis de responsáveis.
       operationId: listarResponsaveis
+      security:
+        - BearerAuth: []
       responses:
         '200':
-          description: Sucesso - Retorna a lista de perfis de responsáveis
+          description: Sucesso - Retorna a lista de perfis de responsáveis.
           content:
             application/json:
               schema:
@@ -220,8 +240,10 @@ paths:
     get:
       tags:
         - Responsaveis
-      summary: Busca um perfil de responsável pelo ID
+      summary: Busca um perfil de responsável pelo ID.
       operationId: buscarResponsavelPorId
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: Sucesso
@@ -234,10 +256,12 @@ paths:
     put:
       tags:
         - Responsaveis
-      summary: Atualiza os dados de um perfil de responsável
+      summary: Atualiza os dados de um perfil de responsável.
       operationId: atualizarResponsavel
+      security:
+        - BearerAuth: []
       requestBody:
-        description: Objeto do responsável com os dados do perfil atualizados
+        description: Objeto do responsável com os dados do perfil atualizados.
         required: true
         content:
           application/json:
@@ -255,8 +279,10 @@ paths:
     delete:
       tags:
         - Responsaveis
-      summary: Apaga um utilizador e seu perfil de responsável
+      summary: Apaga um utilizador e seu perfil de responsável.
       operationId: apagarResponsavel
+      security:
+        - BearerAuth: []
       responses:
         '204':
           description: Apagado com sucesso (Sem conteúdo)
@@ -275,10 +301,12 @@ paths:
     post:
       tags:
         - Responsaveis
-      summary: Adiciona uma nova criança a um perfil de responsável existente
+      summary: Adiciona uma nova criança a um perfil de responsável existente.
       operationId: adicionarCrianca
+      security:
+        - BearerAuth: []
       requestBody:
-        description: Objeto da nova criança a ser adicionada
+        description: Objeto da nova criança a ser adicionada.
         required: true
         content:
           application/json:
@@ -294,15 +322,20 @@ paths:
         '404':
           description: Perfil de Responsável não encontrado
 
+  # ===============================================================
+  # ENDPOINTS DE MOTORISTAS
+  # ===============================================================
   /motoristas:
     get:
       tags:
         - Motoristas
-      summary: Lista todos os perfis de motoristas
+      summary: Lista todos os perfis de motoristas.
       operationId: listarMotoristas
+      security:
+        - BearerAuth: []
       responses:
         '200':
-          description: Sucesso - Retorna a lista de perfis de motoristas
+          description: Sucesso - Retorna a lista de perfis de motoristas.
           content:
             application/json:
               schema:
@@ -322,8 +355,10 @@ paths:
     get:
       tags:
         - Motoristas
-      summary: Busca um perfil de motorista pelo ID
+      summary: Busca um perfil de motorista pelo ID.
       operationId: buscarMotoristaPorId
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: Sucesso
@@ -336,10 +371,12 @@ paths:
     put:
       tags:
         - Motoristas
-      summary: Atualiza os dados de um perfil de motorista
+      summary: Atualiza os dados de um perfil de motorista.
       operationId: atualizarMotorista
+      security:
+        - BearerAuth: []
       requestBody:
-        description: Objeto do motorista com os dados do perfil atualizados
+        description: Objeto do motorista com os dados do perfil atualizados.
         required: true
         content:
           application/json:
@@ -357,23 +394,30 @@ paths:
     delete:
       tags:
         - Motoristas
-      summary: Apaga um utilizador e seu perfil de motorista
+      summary: Apaga um utilizador e seu perfil de motorista.
       operationId: apagarMotorista
+      security:
+        - BearerAuth: []
       responses:
         '204':
           description: Apagado com sucesso (Sem conteúdo)
         '404':
           description: Perfil de Motorista não encontrado
 
+  # ===============================================================
+  # ENDPOINTS DE ESCOLAS
+  # ===============================================================
   /escolas:
     get:
       tags:
         - Escolas
-      summary: Lista todas as escolas
+      summary: Lista todas as escolas.
       operationId: listarEscolas
+      security:
+        - BearerAuth: []
       responses:
         '200':
-          description: Sucesso - Retorna a lista de escolas
+          description: Sucesso - Retorna a lista de escolas.
           content:
             application/json:
               schema:
@@ -383,10 +427,12 @@ paths:
     post:
       tags:
         - Escolas
-      summary: Cria uma nova escola
+      summary: Cria uma nova escola.
       operationId: criarEscola
+      security:
+        - BearerAuth: [] # Geralmente criar escola seria uma tarefa de admin
       requestBody:
-        description: Objeto da escola a ser criada
+        description: Objeto da escola a ser criada.
         required: true
         content:
           application/json:
@@ -414,8 +460,10 @@ paths:
     get:
       tags:
         - Escolas
-      summary: Busca uma escola pelo ID
+      summary: Busca uma escola pelo ID.
       operationId: buscarEscolaPorId
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: Sucesso
@@ -428,10 +476,12 @@ paths:
     put:
       tags:
         - Escolas
-      summary: Atualiza uma escola existente
+      summary: Atualiza uma escola existente.
       operationId: atualizarEscola
+      security:
+        - BearerAuth: []
       requestBody:
-        description: Objeto da escola com os dados atualizados
+        description: Objeto da escola com os dados atualizados.
         required: true
         content:
           application/json:
@@ -449,8 +499,10 @@ paths:
     delete:
       tags:
         - Escolas
-      summary: Apaga uma escola
+      summary: Apaga uma escola.
       operationId: apagarEscola
+      security:
+        - BearerAuth: []
       responses:
         '204':
           description: Apagada com sucesso (Sem conteúdo)
@@ -531,6 +583,34 @@ components:
       type: object
       properties:
         token:
+          type: string
+
+    MyUserResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        picture:
+          type: string
+        cpfResponsavel:
+          type: string
+        enderecoCasa:
+          type: string
+        cnh:
+          type: integer
+          format: int64
+        cpfMotorista:
+          type: integer
+          format: int64
+        placaVeiculo:
           type: string
 
     Responsaveis:

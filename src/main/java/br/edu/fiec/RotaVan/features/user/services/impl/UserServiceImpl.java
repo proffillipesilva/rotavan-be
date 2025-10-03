@@ -1,6 +1,9 @@
 package br.edu.fiec.RotaVan.features.user.services.impl;
 
-import br.edu.fiec.RotaVan.features.user.models.User; // Importar o modelo User
+import br.edu.fiec.RotaVan.features.user.dto.MyUserResponse;
+import br.edu.fiec.RotaVan.features.user.models.Motoristas;
+import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
+import br.edu.fiec.RotaVan.features.user.models.User;
 import br.edu.fiec.RotaVan.features.user.repositories.UserRepository;
 import br.edu.fiec.RotaVan.features.user.services.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,5 +35,39 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public MyUserResponse getMe(User user) {
+        MyUserResponse response = new MyUserResponse();
+        response.setUserId(user.getId());
+        response.setNome(user.getNome());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole().name());
+        response.setPicture(user.getPicture());
+
+        switch (user.getRole()) {
+            case ROLE_RESPONSAVEL:
+                Responsaveis responsavel = user.getResponsavelProfile();
+                if (responsavel != null) {
+                    response.setCpfResponsavel(responsavel.getCpfResponsavel());
+                    response.setEnderecoCasa(responsavel.getEnderecoCasa());
+                }
+                break;
+            case ROLE_MOTORISTA:
+                Motoristas motorista = user.getMotoristaProfile();
+                if (motorista != null) {
+                    response.setCnh(motorista.getCnh());
+                    response.setCpfMotorista(motorista.getCpf());
+                    response.setPlacaVeiculo(motorista.getPlacaVeiculo());
+                }
+                break;
+            case ROLE_ADMIN:
+                // Para o admin, os dados básicos que já preenchemos são suficientes.
+                // Não há ações adicionais necessárias.
+                break;
+        }
+
+        return response;
     }
 }

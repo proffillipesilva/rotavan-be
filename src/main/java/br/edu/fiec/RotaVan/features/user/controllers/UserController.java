@@ -1,5 +1,6 @@
 package br.edu.fiec.RotaVan.features.user.controllers;
 
+import br.edu.fiec.RotaVan.features.user.dto.MyUserResponse;
 import br.edu.fiec.RotaVan.features.user.models.User;
 import br.edu.fiec.RotaVan.features.user.services.UserService;
 import br.edu.fiec.RotaVan.utils.ImageUtils;
@@ -30,7 +31,6 @@ public class UserController {
         User user = (User) authentication.getPrincipal();
 
         // 2. Chama a classe utilitária para salvar a imagem no servidor.
-        //    (Lembre-se de criar a classe ImageUtils e adicionar a dependência 'thumbnailator' ao pom.xml)
         String nomeDaImagem = ImageUtils.saveImage(image);
 
         // 3. Atualiza o campo 'picture' no objeto do utilizador.
@@ -41,5 +41,22 @@ public class UserController {
 
         // 5. Retorna uma resposta de sucesso.
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint para obter as informações do perfil do utilizador autenticado.
+     * @param authentication O objeto de autenticação injetado pelo Spring Security.
+     * @return Um ResponseEntity contendo os dados do perfil do utilizador.
+     */
+    @GetMapping("/me")
+    public ResponseEntity<MyUserResponse> getMe(Authentication authentication) {
+        // 1. Obtém o objeto 'User' do utilizador que fez a requisição.
+        User user = (User) authentication.getPrincipal();
+
+        // 2. Chama o serviço para montar a resposta com os dados do perfil.
+        MyUserResponse response = userService.getMe(user);
+
+        // 3. Retorna os dados com um status HTTP 200 OK.
+        return ResponseEntity.ok(response);
     }
 }
