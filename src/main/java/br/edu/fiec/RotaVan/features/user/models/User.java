@@ -25,6 +25,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column
+    private String nome; // CAMPO ADICIONADO
+
     @Enumerated(EnumType.STRING) // Guarda o nome do enum (ex: "ROLE_RESPONSAVEL") em vez de um número
     @Column(nullable = false)
     private Role role;

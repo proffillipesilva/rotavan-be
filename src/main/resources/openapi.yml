@@ -10,7 +10,11 @@ servers:
 
 tags:
   - name: Autenticação
-    description: Endpoints para registo e login de usuários.
+    description: Endpoints para registo e login de utilizadores.
+  - name: Utilizadores
+    description: Operações relacionadas aos perfis dos utilizadores.
+  - name: Imagens
+    description: Endpoints para visualização de imagens.
   - name: Responsaveis
     description: Operações para gerir perfis de responsáveis.
   - name: Motoristas
@@ -22,11 +26,14 @@ security:
   - BearerAuth: []
 
 paths:
+  # ===============================================================
+  # ENDPOINTS DE AUTENTICAÇÃO
+  # ===============================================================
   /v1/api/auth/register:
     post:
       tags:
         - Autenticação
-      summary: Regista um novo usuário (Responsável) e retorna um token.
+      summary: Regista um novo utilizador (Responsável) e retorna um token.
       operationId: registrarResponsavel
       security: []
       requestBody:
@@ -46,11 +53,59 @@ paths:
         '400':
           description: Dados de registo inválidos.
 
+  /v1/api/auth/register/motorista:
+    post:
+      tags:
+        - Autenticação
+      summary: Regista um novo utilizador (Motorista) e retorna um token.
+      operationId: registrarMotorista
+      security: []
+      requestBody:
+        description: Dados para o registo do novo Motorista.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotoristaRegisterRequest'
+      responses:
+        '200':
+          description: Registo bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Dados de registo inválidos.
+
+  /v1/api/auth/register/admin:
+    post:
+      tags:
+        - Autenticação
+      summary: Regista um novo utilizador (Admin) e retorna um token.
+      operationId: registrarAdmin
+      security: []
+      requestBody:
+        description: Dados para o registo do novo Admin.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRegisterRequest'
+      responses:
+        '200':
+          description: Registo bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Dados de registo inválidos.
+
   /v1/api/auth/login:
     post:
       tags:
         - Autenticação
-      summary: Autentica um usuário e retorna um token.
+      summary: Autentica um utilizador e retorna um token.
       operationId: loginUsuario
       security: []
       requestBody:
@@ -70,6 +125,73 @@ paths:
         '403':
           description: Email ou senha inválidos.
 
+  # ===============================================================
+  # ENDPOINTS DE UTILIZADORES
+  # ===============================================================
+  /v1/api/users/perfil/foto:
+    put:
+      tags:
+        - Utilizadores
+      summary: Upload da foto de perfil do utilizador.
+      operationId: uploadFotoPerfil
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Ficheiro de imagem para o perfil.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Upload bem-sucedido.
+        '400':
+          description: Ficheiro inválido ou ausente.
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE IMAGENS
+  # ===============================================================
+  /images/{filename}:
+    get:
+      tags:
+        - Imagens
+      summary: Obtém uma imagem pelo nome do ficheiro.
+      operationId: getImage
+      security: []
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: O nome do ficheiro da imagem.
+          schema:
+            type: string
+        - name: thumbnail
+          in: query
+          description: Se deve retornar a miniatura (thumbnail) da imagem.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Sucesso. Retorna o ficheiro da imagem.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Imagem não encontrada.
+
+  # ===============================================================
+  # ENDPOINTS DE RESPONSÁVEIS, MOTORISTAS E ESCOLAS
+  # ===============================================================
   /responsaveis:
     get:
       tags:
@@ -133,7 +255,7 @@ paths:
     delete:
       tags:
         - Responsaveis
-      summary: Apaga um usuário e seu perfil de responsável
+      summary: Apaga um utilizador e seu perfil de responsável
       operationId: apagarResponsavel
       responses:
         '204':
@@ -235,7 +357,7 @@ paths:
     delete:
       tags:
         - Motoristas
-      summary: Apaga um usuário e seu perfil de motorista
+      summary: Apaga um utilizador e seu perfil de motorista
       operationId: apagarMotorista
       responses:
         '204':
@@ -345,19 +467,13 @@ components:
   schemas:
     RegisterRequest:
       type: object
-      required:
-        - email
-        - password
-        - nomeResponsavel
-        - cpfResponsavel
-        - enderecoCasa
+      required: [ "email", "password", "nomeResponsavel", "cpfResponsavel", "enderecoCasa" ]
       properties:
         email:
           type: string
           format: email
         password:
           type: string
-          format: password
         nomeResponsavel:
           type: string
         cpfResponsavel:
@@ -368,18 +484,49 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CriancaRegisterDTO'
-    LoginRequest:
+
+    MotoristaRegisterRequest:
       type: object
-      required:
-        - email
-        - password
+      required: [ "email", "password", "nomeMotorista", "cnh", "cpf", "placaVeiculo" ]
       properties:
         email:
           type: string
           format: email
         password:
           type: string
-          format: password
+        nomeMotorista:
+          type: string
+        cnh:
+          type: integer
+          format: int64
+        cpf:
+          type: integer
+          format: int64
+        placaVeiculo:
+          type: string
+
+    AdminRegisterRequest:
+      type: object
+      required: [ "nome", "email", "password" ]
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [ "email", "password" ]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
     LoginResponse:
       type: object
       properties:
@@ -426,6 +573,7 @@ components:
           type: string
         escola:
           $ref: '#/components/schemas/Escolas'
+
     CriancaInput:
       type: object
       required:
@@ -443,6 +591,7 @@ components:
               type: string
               format: uuid
               description: O ID da escola onde a criança estuda. A escola já deve existir.
+
     CriancaRegisterDTO:
       type: object
       required:
@@ -473,6 +622,7 @@ components:
           format: int64
         placaVeiculo:
           type: string
+
     MotoristasProfileInput:
       type: object
       properties:
@@ -502,6 +652,7 @@ components:
           type: string
         telefone:
           type: string
+
     EscolasInput:
       type: object
       required:

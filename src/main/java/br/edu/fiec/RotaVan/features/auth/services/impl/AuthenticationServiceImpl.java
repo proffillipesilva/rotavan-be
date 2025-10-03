@@ -1,12 +1,15 @@
 package br.edu.fiec.RotaVan.features.auth.services.impl;
 
+import br.edu.fiec.RotaVan.features.auth.dto.AdminRegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.CriancaRegisterDTO;
 import br.edu.fiec.RotaVan.features.auth.dto.LoginRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.LoginResponse;
+import br.edu.fiec.RotaVan.features.auth.dto.MotoristaRegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.RegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.services.AuthenticationService;
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Escolas;
+import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 import br.edu.fiec.RotaVan.features.user.models.User;
 import br.edu.fiec.RotaVan.features.user.repositories.EscolasRepository;
@@ -43,6 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public LoginResponse register(RegisterRequest request) {
         // 1. Criar o User
         User user = new User();
+        user.setNome(request.getNomeResponsavel()); // Preenche o novo campo 'nome'
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(User.Role.ROLE_RESPONSAVEL);
@@ -63,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 Crianca crianca = new Crianca();
                 crianca.setNome(dto.getNome());
                 crianca.setEscola(escola);
-                crianca.setResponsavel(responsavelProfile); // Liga a criança ao perfil do responsável
+                crianca.setResponsavel(responsavelProfile);
                 criancasList.add(crianca);
             }
         }
@@ -77,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
 
         // 6. Gerar e retornar o token
-        String token = jwtService.generateTokenComplete(user); // ALTERAÇÃO APLICADA
+        String token = jwtService.generateTokenComplete(user);
         LoginResponse response = new LoginResponse();
         response.setToken(token);
         return response;
@@ -92,7 +96,58 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Email ou senha inválidos."));
 
-        String token = jwtService.generateTokenComplete(user); // ALTERAÇÃO APLICADA
+        String token = jwtService.generateTokenComplete(user);
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse registerMotorista(MotoristaRegisterRequest request) {
+        // 1. Criar o User com a role de Motorista
+        User user = new User();
+        user.setNome(request.getNomeMotorista()); // Preenche o novo campo 'nome'
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(User.Role.ROLE_MOTORISTA);
+
+        // 2. Criar o Perfil do Motorista
+        Motoristas motoristaProfile = new Motoristas();
+        motoristaProfile.setNomeMotorista(request.getNomeMotorista());
+        motoristaProfile.setCnh(request.getCnh());
+        motoristaProfile.setCpf(request.getCpf());
+        motoristaProfile.setPlacaVeiculo(request.getPlacaVeiculo());
+
+        // 3. Ligar o User ao Perfil
+        user.setMotoristaProfile(motoristaProfile);
+        motoristaProfile.setUser(user);
+
+        // 4. Salvar o User (o perfil será salvo em cascata)
+        userRepository.save(user);
+
+        // 5. Gerar e retornar o token
+        String token = jwtService.generateTokenComplete(user);
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse registerAdmin(AdminRegisterRequest request) {
+        // 1. Criar o User com a role de Admin
+        User user = new User();
+        user.setNome(request.getNome());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(User.Role.ROLE_ADMIN);
+
+        // 2. Salvar o User (não há perfil extra para o admin)
+        userRepository.save(user);
+
+        // 3. Gerar e retornar o token
+        String token = jwtService.generateTokenComplete(user);
         LoginResponse response = new LoginResponse();
         response.setToken(token);
         return response;

@@ -1,7 +1,9 @@
 package br.edu.fiec.RotaVan.features.auth.controllers;
 
+import br.edu.fiec.RotaVan.features.auth.dto.AdminRegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.LoginRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.LoginResponse;
+import br.edu.fiec.RotaVan.features.auth.dto.MotoristaRegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.RegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.services.AuthenticationService;
 import jakarta.validation.Valid;
@@ -33,4 +35,15 @@ public class AuthController {
         return ResponseEntity.ok(authenticationService.login(request));
     }
 
+    // ENDPOINT ADICIONADO PARA MOTORISTA
+    @PostMapping("/register/motorista")
+    public ResponseEntity<LoginResponse> registerMotorista(@Valid @RequestBody MotoristaRegisterRequest request) {
+        return ResponseEntity.ok(authenticationService.registerMotorista(request));
+    }
+
+    // ENDPOINT ADICIONADO PARA ADMIN
+    @PostMapping("/register/admin")
+    public ResponseEntity<LoginResponse> registerAdmin(@Valid @RequestBody AdminRegisterRequest request) {
+        return ResponseEntity.ok(authenticationService.registerAdmin(request));
+    }
 }
