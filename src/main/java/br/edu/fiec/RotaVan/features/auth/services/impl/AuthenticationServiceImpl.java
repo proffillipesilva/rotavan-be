@@ -77,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
 
         // 6. Gerar e retornar o token
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateTokenComplete(user); // ALTERAÇÃO APLICADA
         LoginResponse response = new LoginResponse();
         response.setToken(token);
         return response;
@@ -92,7 +92,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Email ou senha inválidos."));
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateTokenComplete(user); // ALTERAÇÃO APLICADA
         LoginResponse response = new LoginResponse();
         response.setToken(token);
         return response;

@@ -36,15 +36,14 @@ public class SecurityConfig  {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    // CÓDIGO NOVO E CORRIGIDO
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(httpSecurityCorsConfigurer -> {
-                    httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
-                })
-                .authenticationProvider(authenticationProvider)
+                // ... (resto da configuração)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/v1/api/auth/**", "/v1/api/vans/**", "/escolas/**").permitAll()
+                        // Adicionamos "/images/**" à lista de rotas públicas
+                        .requestMatchers("/v1/api/auth/**", "/v1/api/vans/**", "/escolas/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
                 ).sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
