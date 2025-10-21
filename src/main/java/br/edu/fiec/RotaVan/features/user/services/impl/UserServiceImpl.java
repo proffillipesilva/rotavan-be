@@ -64,7 +64,6 @@ public class UserServiceImpl implements UserService {
                 if (motorista != null) {
                     response.setCnh(motorista.getCnh());
                     response.setCpfMotorista(motorista.getCpf());
-                    response.setPlacaVeiculo(motorista.getPlacaVeiculo());
                 }
                 break;
             case ROLE_ADMIN:

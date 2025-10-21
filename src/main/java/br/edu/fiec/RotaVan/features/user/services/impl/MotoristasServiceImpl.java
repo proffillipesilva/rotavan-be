@@ -42,7 +42,6 @@ public class MotoristasServiceImpl implements MotoristasService {
                     existingMotorista.setNomeMotorista(motoristaDetails.getNomeMotorista());
                     existingMotorista.setCnh(motoristaDetails.getCnh());
                     existingMotorista.setCpf(motoristaDetails.getCpf());
-                    existingMotorista.setPlacaVeiculo(motoristaDetails.getPlacaVeiculo());
                     return motoristasRepository.save(existingMotorista);
                 });
     }

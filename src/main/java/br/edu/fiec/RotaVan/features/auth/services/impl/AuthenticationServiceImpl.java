@@ -102,12 +102,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return response;
     }
 
+    // --- MÉTODO MODIFICADO ---
     @Override
     @Transactional
     public LoginResponse registerMotorista(MotoristaRegisterRequest request) {
         // 1. Criar o User com a role de Motorista
         User user = new User();
-        user.setNome(request.getNomeMotorista()); // Preenche o novo campo 'nome'
+        user.setNome(request.getNomeMotorista());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(User.Role.ROLE_MOTORISTA);
@@ -115,9 +116,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // 2. Criar o Perfil do Motorista
         Motoristas motoristaProfile = new Motoristas();
         motoristaProfile.setNomeMotorista(request.getNomeMotorista());
-        motoristaProfile.setCnh(request.getCnh());
-        motoristaProfile.setCpf(request.getCpf());
-        motoristaProfile.setPlacaVeiculo(request.getPlacaVeiculo());
+        motoristaProfile.setCnh(request.getCnh()); // Tipo String
+        motoristaProfile.setCpf(request.getCpf()); // Tipo String
+        motoristaProfile.setValCnh(request.getValCnh()); // --- LINHA ADICIONADA ---
 
         // 3. Ligar o User ao Perfil
         user.setMotoristaProfile(motoristaProfile);
@@ -132,6 +133,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         response.setToken(token);
         return response;
     }
+    // --- FIM DA MODIFICAÇÃO ---
 
     @Override
     @Transactional

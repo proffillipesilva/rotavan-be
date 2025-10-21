@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import java.time.LocalDate; // IMPORTAR
 
 @Data
 public class MotoristaRegisterRequest {
@@ -22,12 +23,17 @@ public class MotoristaRegisterRequest {
     @NotBlank(message = "O nome do motorista não pode estar em branco")
     private String nomeMotorista;
 
-    @NotNull(message = "A CNH não pode ser nula")
-    private Long cnh;
+    @NotBlank(message = "A CNH não pode estar em branco") // MUDADO DE @NotNull para @NotBlank
+    private String cnh; // MUDADO DE Long para String
 
-    @NotNull(message = "O CPF não pode ser nulo")
-    private Long cpf;
+    @NotBlank(message = "O CPF não pode estar em branco") // MUDADO DE @NotNull para @NotBlank
+    private String cpf; // MUDADO DE Long para String
 
     @NotBlank(message = "A placa do veículo não pode estar em branco")
     private String placaVeiculo;
+
+    // --- CAMPO ADICIONADO ---
+    @NotNull(message = "A data de validade da CNH não pode ser nula")
+    private LocalDate valCnh;
+    // --- FIM DA ADIÇÃO ---
 }

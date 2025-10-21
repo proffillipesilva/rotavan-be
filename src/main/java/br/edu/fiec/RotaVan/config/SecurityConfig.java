@@ -66,9 +66,5 @@ public class SecurityConfig  {
         return http.build();
     }
 
-    // --- MÉTODO REMOVIDO ---
-    // O @Bean CorsConfigurationSource corsConfigurationSource() foi removido daqui
-    // porque agora está na classe CorsConfig.java
-    // --- FIM DA REMOÇÃO ---
 
 }
