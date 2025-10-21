@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users") // Usar um nome de tabela diferente de "user" que pode ser uma palavra reservada
-@Data
+@Data // Garante que getters, setters, etc., são gerados pelo Lombok
 public class User implements UserDetails {
 
     @Id
@@ -26,7 +26,7 @@ public class User implements UserDetails {
     private String password;
 
     @Column
-    private String nome; // CAMPO ADICIONADO
+    private String nome; // CAMPO ADICIONADO previamente
 
     @Enumerated(EnumType.STRING) // Guarda o nome do enum (ex: "ROLE_RESPONSAVEL") em vez de um número
     @Column(nullable = false)
@@ -34,6 +34,11 @@ public class User implements UserDetails {
 
     @Column
     private String picture;
+
+    // --- CAMPO FCM ADICIONADO ---
+    @Column
+    private String fcmToken;
+    // --- FIM DO CAMPO FCM ---
 
     // Relacionamento Um-para-Um com o perfil do Responsável
     // cascade = CascadeType.ALL: Se o User for apagado, o perfil também é.
@@ -53,9 +58,11 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
+        // O email é usado como username para autenticação
         return email;
     }
 
+    // Estes métodos podem retornar true por padrão se não precisar de lógica extra
     @Override
     public boolean isAccountNonExpired() { return true; }
 
@@ -68,6 +75,7 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() { return true; }
 
+    // Enumeração para os papéis (Roles) dos utilizadores
     public enum Role {
         ROLE_RESPONSAVEL,
         ROLE_MOTORISTA,

@@ -1,5 +1,10 @@
 package br.edu.fiec.RotaVan.features.user.services.impl;
 
+// --- IMPORTAÇÕES ADICIONADAS ---
+import br.edu.fiec.RotaVan.features.firebase.dto.FcmTokenRequest;
+import java.util.UUID;
+// --- FIM DAS IMPORTAÇÕES ---
+
 import br.edu.fiec.RotaVan.features.user.dto.MyUserResponse;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
@@ -70,4 +75,19 @@ public class UserServiceImpl implements UserService {
 
         return response;
     }
+
+    // --- IMPLEMENTAÇÃO ADICIONADA ---
+    @Override // Adicione @Override se estiver a implementar a partir da interface
+    public User updateFcmToken(UUID userId, FcmTokenRequest request) {
+        // 1. Busca o utilizador pelo ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+
+        // 2. Atualiza o atributo fcmToken
+        user.setFcmToken(request.getFcmToken());
+
+        // 3. Salva a alteração no banco de dados
+        return userRepository.save(user);
+    }
+    // --- FIM DA IMPLEMENTAÇÃO ---
 }

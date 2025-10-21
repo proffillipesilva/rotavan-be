@@ -1,4 +1,3 @@
-
 package br.edu.fiec.RotaVan.config;
 
 import br.edu.fiec.RotaVan.config.filters.JwtAuthenticationFilter;
@@ -36,17 +35,25 @@ public class SecurityConfig  {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // CÓDIGO NOVO E CORRIGIDO
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                // ... (resto da configuração)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Aplica configuração CORS
                 .authorizeHttpRequests(requests -> requests
-                        // Adicionamos "/images/**" à lista de rotas públicas
-                        .requestMatchers("/v1/api/auth/**", "/v1/api/vans/**", "/escolas/**", "/images/**").permitAll()
-                        .anyRequest().authenticated()
-                ).sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        // --- LINHA MODIFICADA ---
+                        .requestMatchers(
+                                "/v1/api/auth/**",       // Autenticação
+                                "/v1/api/vans/**",        // Vans (se aplicável)
+                                "/escolas/**",           // Escolas
+                                "/images/**",            // Imagens
+                                "/v1/api/notifications/**" // Notificações adicionadas aqui
+                        ).permitAll() // Permite acesso público
+                        // --- FIM DA MODIFICAÇÃO ---
+                        .anyRequest().authenticated() // Qualquer outra requisição exige autenticação
+                )
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider) // Adiciona o provedor de autenticação
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Adiciona o filtro JWT
 
         return http.build();
     }
@@ -56,13 +63,13 @@ public class SecurityConfig  {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        //configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+        configuration.setAllowedOrigins(List.of("*")); // Permite todas as origens (ajuste se necessário)
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")); // Permite métodos comuns
+        configuration.setAllowedHeaders(Arrays.asList("*")); // Permite todos os cabeçalhos
+        //configuration.setAllowCredentials(true); // Se precisar de cookies/sessões
+        configuration.setMaxAge(3600L); // Cache preflight
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); // Aplica a todos os caminhos
         return source;
     }
 
