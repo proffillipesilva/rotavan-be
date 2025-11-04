@@ -1,0 +1,1648 @@
+openapi: 3.0.3
+info:
+  title: API RotaVan
+  description: API para gestão de transporte escolar, incluindo cadastro de responsáveis, motoristas, escolas, rotas, veículos, contratos e viagens.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Servidor de Desenvolvimento Local
+
+tags:
+  - name: Autenticação
+    description: Endpoints para registo e login de utilizadores.
+  - name: Utilizadores
+    description: Operações relacionadas aos perfis dos utilizadores.
+  - name: Imagens
+    description: Endpoints para visualização de imagens.
+  - name: Responsaveis
+    description: Operações para gerir perfis de responsáveis e suas crianças.
+  - name: Motoristas
+    description: Operações para gerir perfis de motoristas.
+  - name: Escolas
+    description: Operações relacionadas às escolas.
+  - name: Rotas # Nova Tag
+    description: Operações para gerir rotas e seus pontos.
+  - name: Pontos # Nova Tag (Opcional, se usar PontoController)
+    description: Operações para gerir pontos de parada individualmente.
+  - name: Veiculos # Nova Tag
+    description: Operações para gerir veículos.
+  - name: Contratos # Nova Tag
+    description: Operações para gerir contratos entre responsáveis e motoristas.
+  - name: Viagens # Nova Tag
+    description: Operações para gerir viagens escolares.
+
+security:
+  - BearerAuth: [] # Aplica segurança Bearer a todos os endpoints por padrão (exceto os explicitamente excluídos)
+
+paths:
+  # ===============================================================
+  # ENDPOINTS DE AUTENTICAÇÃO (Sem alterações)
+  # ===============================================================
+  /v1/api/auth/register:
+    post:
+      tags:
+        - Autenticação
+      summary: Regista um novo utilizador (Responsável) e retorna um token.
+      operationId: registrarResponsavel
+      security: [] # Endpoint público
+      requestBody:
+        description: Dados para o registo do novo Responsável.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registo bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Dados de registo inválidos ou Escola não encontrada.
+
+  /v1/api/auth/register/motorista:
+    post:
+      tags:
+        - Autenticação
+      summary: Regista um novo utilizador (Motorista) e retorna um token.
+      operationId: registrarMotorista
+      security: [] # Endpoint público
+      requestBody:
+        description: Dados para o registo do novo Motorista.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotoristaRegisterRequest'
+      responses:
+        '200':
+          description: Registo bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Dados de registo inválidos.
+
+  /v1/api/auth/register/admin:
+    post:
+      tags:
+        - Autenticação
+      summary: Regista um novo utilizador (Admin) e retorna um token.
+      operationId: registrarAdmin
+      security: [] # Endpoint público
+      requestBody:
+        description: Dados para o registo do novo Admin.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRegisterRequest'
+      responses:
+        '200':
+          description: Registo bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Dados de registo inválidos.
+
+  /v1/api/auth/login:
+    post:
+      tags:
+        - Autenticação
+      summary: Autentica um utilizador e retorna um token.
+      operationId: loginUsuario
+      security: [] # Endpoint público
+      requestBody:
+        description: Credenciais para login.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login bem-sucedido. Retorna um token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '403':
+          description: Email ou senha inválidos.
+
+  # ===============================================================
+  # ENDPOINTS DE UTILIZADORES (Sem alterações)
+  # ===============================================================
+  /v1/api/users/perfil/foto:
+    put:
+      tags:
+        - Utilizadores
+      summary: Upload da foto de perfil do utilizador.
+      operationId: uploadFotoPerfil
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Ficheiro de imagem para o perfil.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Upload bem-sucedido.
+        '400':
+          description: Ficheiro inválido ou ausente.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/users/me:
+    get:
+      tags:
+        - Utilizadores
+      summary: Obtém as informações do perfil do utilizador autenticado.
+      operationId: getMe
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso. Retorna os dados do perfil do utilizador.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyUserResponse'
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE IMAGENS (Sem alterações)
+  # ===============================================================
+  /images/{filename}:
+    get:
+      tags:
+        - Imagens
+      summary: Obtém uma imagem pelo nome do ficheiro.
+      operationId: getImage
+      security: [] # Endpoint público
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: O nome do ficheiro da imagem.
+          schema:
+            type: string
+        - name: thumbnail
+          in: query
+          description: Se deve retornar a miniatura (thumbnail) da imagem.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Sucesso. Retorna o ficheiro da imagem.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Imagem não encontrada.
+
+  # ===============================================================
+  # ENDPOINTS DE RESPONSÁVEIS (Sem alterações funcionais)
+  # ===============================================================
+  /responsaveis:
+    get:
+      tags:
+        - Responsaveis
+      summary: Lista todos os perfis de responsáveis.
+      operationId: listarResponsaveis
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de perfis de responsáveis.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Responsaveis'
+        '401':
+          description: Não autorizado.
+
+  /responsaveis/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID do perfil do responsável
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Responsaveis
+      summary: Busca um perfil de responsável pelo ID.
+      operationId: buscarResponsavelPorId
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Responsaveis'
+        '404':
+          description: Perfil de Responsável não encontrado
+        '401':
+          description: Não autorizado.
+    put:
+      tags:
+        - Responsaveis
+      summary: Atualiza os dados de um perfil de responsável.
+      operationId: atualizarResponsavel
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto do responsável com os dados do perfil atualizados.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsaveisProfileInput'
+      responses:
+        '200':
+          description: Atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Responsaveis'
+        '404':
+          description: Perfil de Responsável não encontrado
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Responsaveis
+      summary: Apaga um utilizador e seu perfil de responsável.
+      operationId: apagarResponsavel
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagado com sucesso (Sem conteúdo)
+        '404':
+          description: Perfil de Responsável não encontrado
+        '401':
+          description: Não autorizado.
+
+  /responsaveis/{responsavelId}/criancas:
+    parameters:
+      - name: responsavelId
+        in: path
+        required: true
+        description: O ID do perfil do responsável ao qual a criança será adicionada
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - Responsaveis
+      summary: Adiciona uma nova criança a um perfil de responsável existente.
+      operationId: adicionarCrianca
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto da nova criança a ser adicionada (sem o ID do responsável, que vem do path).
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriancaInput' # Usar CriancaInput aqui
+      responses:
+        '201':
+          description: Criança adicionada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Crianca' # Retorna a Criança completa
+        '404':
+          description: Perfil de Responsável não encontrado
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE MOTORISTAS (Sem alterações funcionais)
+  # ===============================================================
+  /motoristas:
+    get:
+      tags:
+        - Motoristas
+      summary: Lista todos os perfis de motoristas.
+      operationId: listarMotoristas
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de perfis de motoristas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Motoristas'
+        '401':
+          description: Não autorizado.
+
+  /motoristas/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID do perfil do motorista
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Motoristas
+      summary: Busca um perfil de motorista pelo ID.
+      operationId: buscarMotoristaPorId
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Motoristas'
+        '404':
+          description: Perfil de Motorista não encontrado
+        '401':
+          description: Não autorizado.
+    put:
+      tags:
+        - Motoristas
+      summary: Atualiza os dados de um perfil de motorista.
+      operationId: atualizarMotorista
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto do motorista com os dados do perfil atualizados.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotoristasProfileInput'
+      responses:
+        '200':
+          description: Atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Motoristas'
+        '404':
+          description: Perfil de Motorista não encontrado
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Motoristas
+      summary: Apaga um utilizador e seu perfil de motorista.
+      operationId: apagarMotorista
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagado com sucesso (Sem conteúdo)
+        '404':
+          description: Perfil de Motorista não encontrado
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE ESCOLAS (Permitir acesso não autenticado para GET?)
+  # ===============================================================
+  /escolas:
+    get:
+      tags:
+        - Escolas
+      summary: Lista todas as escolas.
+      operationId: listarEscolas
+      security: [] # Permitir listar escolas sem login? Ajuste se necessário.
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de escolas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Escolas'
+    post:
+      tags:
+        - Escolas
+      summary: Cria uma nova escola. (Requer autenticação, talvez só Admin?)
+      operationId: criarEscola
+      security:
+        - BearerAuth: [] # Geralmente criar escola seria uma tarefa de admin
+      requestBody:
+        description: Objeto da escola a ser criada.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscolasInput'
+      responses:
+        '201':
+          description: Criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escolas'
+        '400':
+          description: Requisição inválida
+        '401':
+          description: Não autorizado.
+
+  /escolas/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID da escola
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Escolas
+      summary: Busca uma escola pelo ID.
+      operationId: buscarEscolaPorId
+      security: [] # Permitir buscar escola sem login? Ajuste se necessário.
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escolas'
+        '404':
+          description: Escola não encontrada
+    put:
+      tags:
+        - Escolas
+      summary: Atualiza uma escola existente. (Requer autenticação)
+      operationId: atualizarEscola
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto da escola com os dados atualizados.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscolasInput'
+      responses:
+        '200':
+          description: Atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escolas'
+        '404':
+          description: Escola não encontrada
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Escolas
+      summary: Apaga uma escola. (Requer autenticação)
+      operationId: apagarEscola
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagada com sucesso (Sem conteúdo)
+        '404':
+          description: Escola não encontrada
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE ROTAS (NOVOS)
+  # ===============================================================
+  /v1/api/rotas:
+    get:
+      tags:
+        - Rotas
+      summary: Lista todas as rotas.
+      operationId: getAllRotas
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de rotas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rota'
+        '401':
+          description: Não autorizado.
+    post:
+      tags:
+        - Rotas
+      summary: Cria uma nova rota.
+      operationId: createRota
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto da rota a ser criada. Pontos podem ser incluídos opcionalmente.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RotaInput' # Usando um schema de input
+      responses:
+        '201':
+          description: Rota criada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rota'
+        '400':
+          description: Requisição inválida.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/rotas/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID da rota
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Rotas
+      summary: Busca uma rota pelo ID.
+      operationId: getRotaById
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rota'
+        '404':
+          description: Rota não encontrada.
+        '401':
+          description: Não autorizado.
+    put:
+      tags:
+        - Rotas
+      summary: Atualiza uma rota existente.
+      operationId: updateRota
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto da rota com os dados atualizados.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RotaInput' # Usando input schema
+      responses:
+        '200':
+          description: Atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rota'
+        '404':
+          description: Rota não encontrada.
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Rotas
+      summary: Apaga uma rota (e seus pontos em cascata).
+      operationId: deleteRota
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagada com sucesso (Sem conteúdo).
+        '404':
+          description: Rota não encontrada.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/rotas/{rotaId}/pontos:
+    parameters:
+      - name: rotaId
+        in: path
+        required: true
+        description: ID da Rota à qual adicionar o ponto
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Rotas
+      summary: Lista todos os pontos de uma rota específica, ordenados pela ordem.
+      operationId: getPontosByRotaId
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso - Retorna a lista de pontos da rota.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ponto'
+        '404':
+          description: Rota não encontrada.
+        '401':
+          description: Não autorizado.
+    post:
+      tags:
+        - Rotas
+      summary: Adiciona um novo ponto a uma rota existente.
+      operationId: addPontoToRota
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto do ponto a ser adicionado (sem o ID da rota).
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PontoInput' # Usar schema de input
+      responses:
+        '201':
+          description: Ponto adicionado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ponto'
+        '400':
+          description: Requisição inválida.
+        '404':
+          description: Rota não encontrada.
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE PONTOS (OPCIONAL - NOVOS)
+  # ===============================================================
+  /v1/api/pontos/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID do ponto
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Pontos
+      summary: Busca um ponto pelo ID.
+      operationId: getPontoById
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ponto'
+        '404':
+          description: Ponto não encontrado.
+        '401':
+          description: Não autorizado.
+    put:
+      tags:
+        - Pontos
+      summary: Atualiza um ponto existente (sem alterar a rota).
+      operationId: updatePonto
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Objeto do ponto com dados atualizados.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PontoInput' # Usar schema de input
+      responses:
+        '200':
+          description: Atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ponto'
+        '400':
+          description: Requisição inválida.
+        '404':
+          description: Ponto não encontrado.
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Pontos
+      summary: Apaga um ponto pelo ID.
+      operationId: deletePonto
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagado com sucesso.
+        '404':
+          description: Ponto não encontrado.
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE VEICULOS (NOVOS)
+  # ===============================================================
+  /v1/api/veiculos:
+    get:
+      tags:
+        - Veiculos
+      summary: Lista todos os veículos.
+      operationId: getAllVeiculos
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Veiculo'
+        '401':
+          description: Não autorizado.
+    post:
+      tags:
+        - Veiculos
+      summary: Cria um novo veículo.
+      operationId: createVeiculo
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Dados do veículo a ser criado.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VeiculoInput'
+      responses:
+        '201':
+          description: Veículo criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Veiculo'
+        '400':
+          description:
+        '404':
+          description: Motorista associado não encontrado.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/veiculos/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID do veículo
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Veiculos
+      summary: Busca um veículo pelo ID.
+      operationId: getVeiculoById
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Veiculo'
+        '404':
+          description: Veículo não encontrado.
+        '401':
+          description: Não autorizado.
+    put:
+      tags:
+        - Veiculos
+      summary: Atualiza um veículo existente.
+      operationId: updateVeiculo
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Dados do veículo atualizados.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VeiculoInput'
+      responses:
+        '200':
+          description: Atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Veiculo'
+        '400':
+          description:
+        '404':
+          description: Veículo ou Motorista associado não encontrado.
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Veiculos
+      summary: Apaga um veículo.
+      operationId: deleteVeiculo
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagado com sucesso.
+        '404':
+          description: Veículo não encontrado.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/veiculos/placa/{placa}:
+    parameters:
+      - name: placa
+        in: path
+        required: true
+        description: Placa do veículo
+        schema:
+          type: string
+    get:
+      tags:
+        - Veiculos
+      summary: Busca um veículo pela placa.
+      operationId: getVeiculoByPlaca
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Veiculo'
+        '404':
+          description: Veículo não encontrado.
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE CONTRATOS (NOVOS)
+  # ===============================================================
+  /v1/api/contratos:
+    get:
+      tags:
+        - Contratos
+      summary: Lista todos os contratos.
+      operationId: getAllContratos
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contrato'
+        '401':
+          description: Não autorizado.
+    post:
+      tags:
+        - Contratos
+      summary: Cria um novo contrato.
+      operationId: createContrato
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Dados do contrato a ser criado.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContratoInput'
+      responses:
+        '201':
+          description: Contrato criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contrato'
+        '400':
+          description:
+        '404':
+          description: Responsável ou Motorista não encontrado.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/contratos/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID do contrato
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Contratos
+      summary: Busca um contrato pelo ID.
+      operationId: getContratoById
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contrato'
+        '404':
+          description: Contrato não encontrado.
+        '401':
+          description: Não autorizado.
+    put:
+      tags:
+        - Contratos
+      summary: Atualiza um contrato existente.
+      operationId: updateContrato
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Dados do contrato atualizados.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContratoInput' # Input pode omitir FKs se não forem alteráveis
+      responses:
+        '200':
+          description: Atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contrato'
+        '400':
+          description: Requisição inválida.
+        '404':
+          description: Contrato não encontrado.
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Contratos
+      summary: Apaga um contrato.
+      operationId: deleteContrato
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagado com sucesso.
+        '404':
+          description: Contrato não encontrado.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/contratos/responsavel/{responsavelId}:
+    parameters:
+      - name: responsavelId
+        in: path
+        required: true
+        description: ID do Responsável
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Contratos
+      summary: Lista contratos por ID do responsável.
+      operationId: getContratosByResponsavel
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contrato'
+        '404':
+          description: Responsável não encontrado.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/contratos/motorista/{motoristaId}:
+    parameters:
+      - name: motoristaId
+        in: path
+        required: true
+        description: ID do Motorista
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Contratos
+      summary: Lista contratos por ID do motorista.
+      operationId: getContratosByMotorista
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contrato'
+        '404':
+          description: Motorista não encontrado.
+        '401':
+          description: Não autorizado.
+
+  # ===============================================================
+  # ENDPOINTS DE VIAGENS (NOVOS)
+  # ===============================================================
+  /v1/api/viagens:
+    get:
+      tags:
+        - Viagens
+      summary: Lista todas as viagens.
+      operationId: getAllViagens
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Viagem'
+        '401':
+          description: Não autorizado.
+    post:
+      tags:
+        - Viagens
+      summary: Cria uma nova viagem.
+      operationId: createViagem
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Dados da viagem a ser criada.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ViagemInput'
+      responses:
+        '201':
+          description: Viagem criada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Viagem'
+        '400':
+          description:
+        '404':
+          description: Criança, Motorista ou Rota não encontrada.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/viagens/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID da viagem
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Viagens
+      summary: Busca uma viagem pelo ID.
+      operationId: getViagemById
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Viagem'
+        '404':
+          description: Viagem não encontrada.
+        '401':
+          description: Não autorizado.
+    delete:
+      tags:
+        - Viagens
+      summary: Apaga uma viagem.
+      operationId: deleteViagem
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Apagada com sucesso.
+        '404':
+          description: Viagem não encontrada.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/viagens/{id}/status:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID da viagem
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags:
+        - Viagens
+      summary: Atualiza apenas o status de uma viagem.
+      operationId: updateViagemStatus
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Novo status da viagem.
+        required: true
+        content:
+          application/json: # Pode ser text/plain se enviar só a string
+            schema:
+              type: string
+              example: "Concluída"
+      responses:
+        '200':
+          description: Status atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Viagem'
+        '400':
+          description: Status inválido.
+        '404':
+          description: Viagem não encontrada.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/viagens/motorista/{motoristaId}:
+    parameters:
+      - name: motoristaId
+        in: path
+        required: true
+        description: ID do Motorista
+        schema:
+          type: string
+          format: uuid
+      - name: data
+        in: query
+        required: true
+        description: Data da viagem (formato YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+    get:
+      tags:
+        - Viagens
+      summary: Busca viagens por motorista e data.
+      operationId: getViagensByMotoristaAndData
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Viagem'
+        '404':
+          description: Motorista não encontrado.
+        '401':
+          description: Não autorizado.
+
+  /v1/api/viagens/crianca/{criancaId}:
+    parameters:
+      - name: criancaId
+        in: path
+        required: true
+        description: ID da Criança
+        schema:
+          type: string
+          format: uuid
+      - name: inicio
+        in: query
+        required: true
+        description: Data de início do período (formato YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+      - name: fim
+        in: query
+        required: true
+        description: Data de fim do período (formato YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+    get:
+      tags:
+        - Viagens
+      summary: Busca viagens por criança e período.
+      operationId: getViagensByCriancaAndPeriodo
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Viagem'
+        '404':
+          description: Criança não encontrada.
+        '401':
+          description: Não autorizado.
+
+
+# ===============================================================
+# COMPONENTS
+# ===============================================================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # --- Schemas de Autenticação/Utilizador (Atualizados) ---
+    RegisterRequest:
+      type: object
+      required: [ "email", "password", "nomeResponsavel", "cpfResponsavel", "enderecoCasa" ]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+        nomeResponsavel: { type: string }
+        cpfResponsavel: { type: string }
+        enderecoCasa: { type: string }
+        criancas:
+          type: array
+          items:
+            $ref: '#/components/schemas/CriancaRegisterDTO'
+          nullable: true
+
+    MotoristaRegisterRequest:
+      type: object
+      required: [ "email", "password", "nomeMotorista", "cnh", "cpf", "placaVeiculo", "valCnh" ] # Adicionado valCnh
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+        nomeMotorista: { type: string }
+        cnh: { type: string } # Corrigido para string
+        cpf: { type: string } # Corrigido para string
+        placaVeiculo: { type: string } # Nota: Esta placa irá para a entidade Veiculo
+        valCnh: { type: string, format: date } # Adicionado
+
+    AdminRegisterRequest:
+      type: object
+      required: [ "nome", "email", "password" ]
+      properties:
+        nome: { type: string }
+        email: { type: string, format: email }
+        password: { type: string }
+
+    LoginRequest:
+      type: object
+      required: [ "email", "password" ]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+
+    MyUserResponse:
+      type: object
+      properties:
+        userId: { type: string, format: uuid }
+        nome: { type: string }
+        email: { type: string, format: email }
+        role: { type: string }
+        picture: { type: string, nullable: true }
+        # Campos de Responsável (condicional)
+        cpfResponsavel: { type: string, nullable: true }
+        enderecoCasa: { type: string, nullable: true }
+        # Campos de Motorista (condicional)
+        cnh: { type: string, nullable: true } # Corrigido para string
+        cpfMotorista: { type: string, nullable: true } # Corrigido para string
+        # placaVeiculo: REMOVIDO daqui (agora em Veiculo)
+
+    # --- Schemas de Perfis/Entidades Existentes (Atualizados) ---
+    Responsaveis:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        nomeResponsavel: { type: string }
+        cpfResponsavel: { type: string }
+        enderecoCasa: { type: string }
+        criancas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Crianca' # A Criança agora tem mais campos
+          readOnly: true
+
+    ResponsaveisProfileInput: # Para PUT /responsaveis/{id}
+      type: object
+      properties:
+        nomeResponsavel: { type: string }
+        cpfResponsavel: { type: string }
+        enderecoCasa: { type: string }
+
+    Crianca:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        nome: { type: string }
+        escola: { $ref: '#/components/schemas/Escolas' }
+        # --- Campos Adicionados ---
+        dataNascimento: { type: string, format: date, nullable: true }
+        nivelEscolar: { type: string, nullable: true }
+        endereco: { type: string, nullable: true }
+        telefone: { type: string, nullable: true }
+
+    CriancaInput: # Para POST /responsaveis/{responsavelId}/criancas
+      type: object
+      required: [ nome, escolaId ]
+      properties:
+        nome: { type: string }
+        escolaId: { type: string, format: uuid, description: ID da escola existente }
+        # --- Campos Adicionados ---
+        dataNascimento: { type: string, format: date, nullable: true }
+        nivelEscolar: { type: string, nullable: true }
+        endereco: { type: string, nullable: true }
+        telefone: { type: string, nullable: true }
+
+    CriancaRegisterDTO: # Usado no RegisterRequest
+      type: object
+      required: [ nome, escolaId ]
+      properties:
+        nome: { type: string }
+        escolaId: { type: string, format: uuid, description: ID da escola existente }
+        # Não precisa dos campos adicionais aqui, pois são para Dependente/Crianca, não para o registo inicial
+
+    Motoristas:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        nomeMotorista: { type: string }
+        cnh: { type: string } # Corrigido para string
+        cpf: { type: string } # Corrigido para string
+        # placaVeiculo: REMOVIDO
+        valCnh: { type: string, format: date } # Adicionado
+        veiculos: # Adicionado relacionamento
+          type: array
+          items:
+            $ref: '#/components/schemas/VeiculoInfo' # Schema simplificado
+          readOnly: true
+          nullable: true
+
+    MotoristasProfileInput: # Para PUT /motoristas/{id}
+      type: object
+      properties:
+        nomeMotorista: { type: string }
+        cnh: { type: string } # Corrigido para string
+        cpf: { type: string } # Corrigido para string
+        # placaVeiculo: REMOVIDO
+        valCnh: { type: string, format: date } # Adicionado
+
+    Escolas:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        nome: { type: string }
+        cnpj: { type: string }
+        endereco: { type: string }
+        telefone: { type: string, nullable: true }
+
+    EscolasInput: # Para POST e PUT /escolas
+      type: object
+      required: [ nome, cnpj, endereco ]
+      properties:
+        nome: { type: string }
+        cnpj: { type: string }
+        endereco: { type: string }
+        telefone: { type: string, nullable: true }
+
+    # --- Schemas para Novas Entidades ---
+
+    # Rota
+    Rota:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        nomeRota: { type: string }
+        descricao: { type: string, nullable: true }
+        distanciaKm: { type: number, format: double, nullable: true }
+        tempoEstimadoMin: { type: integer, nullable: true }
+        pontos:
+          type: array
+          items:
+            $ref: '#/components/schemas/PontoInfo' # Simplificado para evitar recursão
+          readOnly: true
+          nullable: true
+        # viagens: # Omitido para simplicidade na resposta principal da Rota
+
+    RotaInput: # Para POST e PUT /rotas
+      type: object
+      required: [ nomeRota ]
+      properties:
+        nomeRota: { type: string }
+        descricao: { type: string, nullable: true }
+        distanciaKm: { type: number, format: double, nullable: true }
+        tempoEstimadoMin: { type: integer, nullable: true }
+        # Não inclui pontos ou viagens
+
+    # Ponto
+    Ponto:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        longitude: { type: number, format: double } # BigDecimal mapeado para number
+        latitude: { type: number, format: double }
+        nomePonto: { type: string, nullable: true }
+        ordem: { type: integer }
+        rota: { $ref: '#/components/schemas/RotaInfo' } # Simplificado
+
+    PontoInput: # Para POST /rotas/{rotaId}/pontos e PUT /pontos/{id}
+      type: object
+      required: [ longitude, latitude, ordem ]
+      properties:
+        longitude: { type: number, format: double }
+        latitude: { type: number, format: double }
+        nomePonto: { type: string, nullable: true }
+        ordem: { type: integer }
+        # Não inclui Rota (vem do path ou não é alterado no PUT individual)
+
+    # Veiculo
+    Veiculo:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        placa: { type: string }
+        capacidade: { type: integer }
+        modelo: { type: string, nullable: true }
+        motorista: { $ref: '#/components/schemas/MotoristaInfo' } # Simplificado
+
+    VeiculoInput: # Para POST e PUT /veiculos
+      type: object
+      required: [ placa, capacidade, motoristaId ]
+      properties:
+        placa: { type: string }
+        capacidade: { type: integer }
+        modelo: { type: string, nullable: true }
+        motoristaId: { type: string, format: uuid, description: ID do motorista existente }
+
+    # Contrato
+    Contrato:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        dataInicio: { type: string, format: date }
+        dataFim: { type: string, format: date }
+        valorMensal: { type: number, format: double } # BigDecimal
+        responsavel: { $ref: '#/components/schemas/ResponsavelInfo' } # Simplificado
+        motorista: { $ref: '#/components/schemas/MotoristaInfo' } # Simplificado
+
+    ContratoInput: # Para POST e PUT /contratos
+      type: object
+      required: [ dataInicio, dataFim, valorMensal, responsavelId, motoristaId ]
+      properties:
+        dataInicio: { type: string, format: date }
+        dataFim: { type: string, format: date }
+        valorMensal: { type: number, format: double }
+        responsavelId: { type: string, format: uuid, description: ID do responsável existente }
+        motoristaId: { type: string, format: uuid, description: ID do motorista existente }
+
+    # Viagem
+    Viagem:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        data: { type: string, format: date }
+        horaSaida: { type: string, format: time, example: "06:30:00" } # Formato HH:mm:ss
+        horaChegada: { type: string, format: time, nullable: true, example: "07:15:00" }
+        status: { type: string, nullable: true }
+        crianca: { $ref: '#/components/schemas/CriancaInfo' } # Simplificado
+        motorista: { $ref: '#/components/schemas/MotoristaInfo' } # Simplificado
+        rota: { $ref: '#/components/schemas/RotaInfo' } # Simplificado
+
+    ViagemInput: # Para POST /viagens
+      type: object
+      required: [ data, horaSaida, criancaId, motoristaId, rotaId ]
+      properties:
+        data: { type: string, format: date }
+        horaSaida: { type: string, format: time, example: "06:30:00" }
+        horaChegada: { type: string, format: time, nullable: true, example: "07:15:00" }
+        status: { type: string, nullable: true, example: "Agendada" }
+        criancaId: { type: string, format: uuid, description: ID da criança existente }
+        motoristaId: { type: string, format: uuid, description: ID do motorista existente }
+        rotaId: { type: string, format: uuid, description: ID da rota existente }
+
+    # --- Schemas Simplificados para Relacionamentos ---
+    RotaInfo:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nomeRota: { type: string }
+
+    PontoInfo:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nomePonto: { type: string, nullable: true }
+        ordem: { type: integer }
+
+    MotoristaInfo:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nomeMotorista: { type: string }
+
+    VeiculoInfo:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        placa: { type: string }
+        modelo: { type: string, nullable: true }
+
+    ResponsavelInfo:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nomeResponsavel: { type: string }
+
+    CriancaInfo:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nome: { type: string }
