@@ -1,5 +1,7 @@
 package br.edu.fiec.RotaVan.features.rotas.models; // Ajuste o pacote conforme necessário
 
+import br.edu.fiec.RotaVan.features.solicitacao.models.Solicitacao;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -36,4 +38,9 @@ public class Rota {
     // Usamos FetchType.LAZY para não carregar todas as viagens sempre que carregar uma rota
     @OneToMany(mappedBy = "rota", fetch = FetchType.LAZY)
     private List<Viagem> viagens;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_solicitacao") // Chave estrangeira
+    @JsonIgnore // Evita loops infinitos ao buscar
+    private Solicitacao solicitacao;
 }

@@ -45,5 +45,9 @@ public class Crianca {
 
     @Column(length = 20)
     private String telefone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_servico")
+    private TipoServico tipoServico;
     // --- FIM DOS CAMPOS ADICIONADOS ---
 }
