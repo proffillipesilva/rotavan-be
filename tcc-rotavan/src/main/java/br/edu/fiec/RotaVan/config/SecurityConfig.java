@@ -55,7 +55,9 @@ public class SecurityConfig  {
                                 "/v1/api/vans/**",
                                 "/escolas/**",
                                 "/images/**",
-                                "/v1/api/notifications/**"
+                                "/v1/api/notifications/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
