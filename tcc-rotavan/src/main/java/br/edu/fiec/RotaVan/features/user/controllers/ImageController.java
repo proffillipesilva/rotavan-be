@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -25,6 +26,7 @@ import static br.edu.fiec.RotaVan.utils.ImageUtils.UPLOAD_DIR;
 @Slf4j
 @RestController
 @RequestMapping("/images")
+@Tag(name = "Imagens", description = "API para servir arquivos de imagem (uploads, thumbnails)")
 public class ImageController {
 
     @Operation(summary = "Busca uma imagem pelo nome do arquivo (para UPLOAD_DIR ou THUMBNAIL_DIR)",

@@ -6,10 +6,14 @@ import br.edu.fiec.RotaVan.features.user.services.UserService;
 // import br.edu.fiec.RotaVan.utils.ImageUtils; // Não precisamos mais disso aqui
 import br.edu.fiec.RotaVan.shared.service.S3Service; // IMPORTAR S3
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -40,9 +44,17 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
             @ApiResponse(responseCode = "500", description = "Erro interno ao processar o upload da imagem")
     })
-    @PutMapping("/perfil/foto")
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping(value = "/perfil/foto", consumes = "multipart/form-data")
     // Adicionar "throws IOException"
-    public ResponseEntity<Void> inserirFoto(@RequestParam("image") MultipartFile image, Authentication authentication) throws IOException {
+    public ResponseEntity<Void> inserirFoto(
+            @Parameter(description = "Arquivo de imagem (PNG, JPG, etc.) a ser enviado.",
+                    required = true,
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestParam("image") MultipartFile image,
+
+            Authentication authentication) throws IOException {
+
         User user = (User) authentication.getPrincipal();
 
         // LINHA ANTIGA:

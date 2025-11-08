@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/responsaveis")
+@Tag(name = "Responsáveis", description = "API para gerenciamento de Responsáveis e seus dependentes")
 public class ResponsaveisController {
 
     private final ResponsaveisService responsaveisService;
@@ -40,7 +42,7 @@ public class ResponsaveisController {
     }
 
 
-    @Operation(summary = "Adiciona um nov dependente a um responsável",
+    @Operation(summary = "Adiciona um novo dependente a um responsável",
             description = "Cria um novo registro de dependente e o associa a um responsável existente, usando o ID do responsável.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "dependente criado e associado com sucesso!"),
