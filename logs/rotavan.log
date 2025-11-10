@@ -971,3 +971,51 @@ Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-valid
 2025-11-10 19:56:26.916 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-11-10 19:56:26.918 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-11-10 19:56:26.920 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-11-10 19:56:29.850 [background-preinit] INFO  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-11-10 19:56:29.894 [restartedMain] INFO  b.e.f.R.RotaVanApplication - Starting RotaVanApplication using Java 21.0.8 with PID 18628 (C:\Users\41685\Desktop\RotaVan\tcc-rotavan\target\classes started by 41685 in C:\Users\41685\Desktop\RotaVan)
+2025-11-10 19:56:29.900 [restartedMain] INFO  b.e.f.R.RotaVanApplication - No active profile set, falling back to 1 default profile: "default"
+2025-11-10 19:56:29.939 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-11-10 19:56:29.939 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-11-10 19:56:30.353 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-11-10 19:56:30.428 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 69 ms. Found 11 JPA repository interfaces.
+2025-11-10 19:56:31.186 [restartedMain] INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat initialized with port 5000 (http)
+2025-11-10 19:56:31.199 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-5000"]
+2025-11-10 19:56:31.201 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-11-10 19:56:31.202 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-11-10 19:56:31.245 [restartedMain] INFO  o.a.c.c.C.[.[.[/] - Initializing Spring embedded WebApplicationContext
+2025-11-10 19:56:31.246 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1305 ms
+2025-11-10 19:56:31.457 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2025-11-10 19:56:31.661 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@359cc295
+2025-11-10 19:56:31.663 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2025-11-10 19:56:31.693 [restartedMain] INFO  o.f.c.FlywayExecutor - Database: jdbc:mysql://localhost:3310/rotavan (MySQL 8.0)
+2025-11-10 19:56:31.727 [restartedMain] INFO  o.f.c.i.c.DbValidate - Successfully validated 2 migrations (execution time 00:00.018s)
+2025-11-10 19:56:31.737 [restartedMain] INFO  o.f.c.i.c.DbMigrate - Current version of schema `rotavan`: 2
+2025-11-10 19:56:31.739 [restartedMain] INFO  o.f.c.i.c.DbMigrate - Schema `rotavan` is up to date. No migration necessary.
+2025-11-10 19:56:31.821 [restartedMain] INFO  o.h.j.i.u.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-11-10 19:56:31.867 [restartedMain] INFO  o.h.Version - HHH000412: Hibernate ORM core version 6.6.22.Final
+2025-11-10 19:56:31.900 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-11-10 19:56:32.065 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-11-10 19:56:32.094 [restartedMain] WARN  o.h.o.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-11-10 19:56:32.095 [restartedMain] WARN  o.h.o.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-11-10 19:56:32.102 [restartedMain] INFO  o.h.o.c.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-11-10 19:56:32.754 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-11-10 19:56:32.780 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-11-10 19:56:33.040 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-10 19:56:33.198 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-11-10 19:56:33.199 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-11-10 19:56:34.099 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-11-10 19:56:34.110 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-5000"]
+2025-11-10 19:56:34.122 [restartedMain] INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat started on port 5000 (http) with context path '/'
+2025-11-10 19:56:34.128 [restartedMain] INFO  b.e.f.R.RotaVanApplication - Started RotaVanApplication in 4.461 seconds (process running for 5.037)
+2025-11-10 20:05:48.423 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.t.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-11-10 20:05:48.429 [tomcat-shutdown] INFO  o.s.b.w.e.t.GracefulShutdown - Graceful shutdown complete
+2025-11-10 20:05:48.433 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-11-10 20:05:48.435 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-11-10 20:05:48.438 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.

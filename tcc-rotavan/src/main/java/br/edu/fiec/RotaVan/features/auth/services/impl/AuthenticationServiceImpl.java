@@ -168,4 +168,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         response.setToken(token);
         return response;
     }
+
+    @Override
+    public LoginResponse register(RegisterRequest request) {
+        return null;
+    }
 }
