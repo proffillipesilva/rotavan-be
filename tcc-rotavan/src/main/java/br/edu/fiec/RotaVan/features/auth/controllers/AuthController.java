@@ -26,10 +26,11 @@ public class AuthController {
     }
 
 
-    @PostMapping("/register")
-    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
+    @PostMapping("/register/responsavel") // <-- Renomeado de "/register"
+    public ResponseEntity<LoginResponse> registerResponsavel(@Valid @RequestBody RegisterRequest request) { // <-- Renomeado de "register"
         log.info("Recebida requisição para registar novo responsável com email: {}", request.getEmail());
-        LoginResponse response = authenticationService.register(request);
+        // Abaixo, chamaremos o método de serviço renomeado
+        LoginResponse response = authenticationService.registerResponsavel(request); // <-- Renomeado de "register"
         log.info("Responsável registado com sucesso para o email: {}", request.getEmail());
         return ResponseEntity.ok(response);
     }

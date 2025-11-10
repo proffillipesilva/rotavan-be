@@ -7,7 +7,7 @@ import br.edu.fiec.RotaVan.features.auth.dto.MotoristaRegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.RegisterRequest;
 
 public interface AuthenticationService {
-    LoginResponse register(RegisterRequest request);
+    LoginResponse registerResponsavel(RegisterRequest request);
 
     LoginResponse login(LoginRequest request);
 

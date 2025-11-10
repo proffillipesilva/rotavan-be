@@ -12,6 +12,10 @@ import br.edu.fiec.RotaVan.features.user.models.Escolas;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 import br.edu.fiec.RotaVan.features.user.models.User;
+// IMPORT FALTANTE (ADICIONADO)
+import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
+// IMPORT FALTANTE (ADICIONADO)
+import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.EscolasRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.UserRepository;
 import br.edu.fiec.RotaVan.utils.JwtService;
@@ -33,17 +37,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationServiceImpl(UserRepository userRepository, EscolasRepository escolasRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    // CAMPOS FALTANTES (ADICIONADOS)
+    private final MotoristasRepository motoristasRepository;
+    private final ResponsaveisRepository responsaveisRepository;
+
+
+    // CONSTRUTOR ATUALIZADO
+    public AuthenticationServiceImpl(UserRepository userRepository, EscolasRepository escolasRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, MotoristasRepository motoristasRepository, ResponsaveisRepository responsaveisRepository) {
         this.userRepository = userRepository;
         this.escolasRepository = escolasRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        // LINHAS ADICIONADAS
+        this.motoristasRepository = motoristasRepository;
+        this.responsaveisRepository = responsaveisRepository;
     }
 
     @Override
     @Transactional
-    public LoginResponse register(RegisterRequest request) {
+    // MÉTODO RENOMEADO (era "register")
+    public LoginResponse registerResponsavel(RegisterRequest request) {
         // 1. Criar o User
         User user = new User();
         user.setNome(request.getNomeResponsavel()); // Preenche o novo campo 'nome'
@@ -102,7 +116,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return response;
     }
 
-    // --- MÉTODO MODIFICADO ---
     @Override
     @Transactional
     public LoginResponse registerMotorista(MotoristaRegisterRequest request) {
@@ -118,14 +131,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         motoristaProfile.setNomeMotorista(request.getNomeMotorista());
         motoristaProfile.setCnh(request.getCnh()); // Tipo String
         motoristaProfile.setCpf(request.getCpf()); // Tipo String
-        motoristaProfile.setValCnh(request.getValCnh()); // --- LINHA ADICIONADA ---
+        motoristaProfile.setValCnh(request.getValCnh());
 
         // 3. Ligar o User ao Perfil
         user.setMotoristaProfile(motoristaProfile);
         motoristaProfile.setUser(user);
 
         // 4. Salvar o User (o perfil será salvo em cascata)
+        // Precisamos salvar o motoristaProfile também se a cascata não estiver no User
         userRepository.save(user);
+        motoristasRepository.save(motoristaProfile); // Salva explicitamente
 
         // 5. Gerar e retornar o token
         String token = jwtService.generateTokenComplete(user);
@@ -133,7 +148,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         response.setToken(token);
         return response;
     }
-    // --- FIM DA MODIFICAÇÃO ---
 
     @Override
     @Transactional
