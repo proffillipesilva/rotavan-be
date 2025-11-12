@@ -32,7 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
+# Ignorar arquivos de configuração com segredos
 /src/main/resources/firebase-service-account.json
+/src/main/resources/application.properties
+
 # Ignorar logs
 logs/
 *.log
