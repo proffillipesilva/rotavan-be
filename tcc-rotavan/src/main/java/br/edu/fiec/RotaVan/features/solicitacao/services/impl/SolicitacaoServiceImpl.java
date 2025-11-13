@@ -1,4 +1,4 @@
-package br.edu.fiec.RotaVan.features.solicitacao.services;
+package br.edu.fiec.RotaVan.features.solicitacao.services.impl;
 
 import br.edu.fiec.RotaVan.features.contratos.models.Contrato;
 import br.edu.fiec.RotaVan.features.contratos.repositories.ContratoRepository;
@@ -6,6 +6,7 @@ import br.edu.fiec.RotaVan.features.rotas.models.Ponto;
 import br.edu.fiec.RotaVan.features.rotas.models.Rota;
 import br.edu.fiec.RotaVan.features.rotas.repositories.PontoRepository;
 import br.edu.fiec.RotaVan.features.rotas.repositories.RotaRepository;
+import br.edu.fiec.RotaVan.features.solicitacao.services.SolicitacaoService;
 import br.edu.fiec.RotaVan.shared.dto.ResultadoOtimizadoDTO;
 import br.edu.fiec.RotaVan.shared.service.GoogleMapsService;
 import br.edu.fiec.RotaVan.features.solicitacao.dto.DecisaoRequestDTO;
@@ -38,6 +39,8 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
     private final RotaRepository rotaRepository;
     private final PontoRepository pontoRepository;
     private final ContratoRepository contratoRepository;
+
+    // Injeta o serviço real do Google Maps
     private final GoogleMapsService googleMapsService;
 
     @Override
@@ -84,6 +87,7 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
 
     /**
      * PASSO 2 (A MÁGICA) - Método privado para calcular uma rota (IDA ou VOLTA)
+     * Este método foi ATUALIZADO para usar o GoogleMapsService.
      */
     private Rota calcularERotaSugerida(Solicitacao solicitacao, Motoristas motorista, Crianca novoAluno, Escolas escola, TipoServico tipo) {
 
@@ -114,6 +118,7 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
         }
 
         // Busca os alunos antigos que se encaixam na rota
+        // (Assume que CriancaRepository.findAlunosAceitosParaRota existe)
         List<Crianca> alunosAntigos = criancaRepository.findAlunosAceitosParaRota(
                 motorista,
                 escola,
@@ -129,6 +134,7 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
         }
 
         // 4. API Externa (Google Maps) - AGORA É REAL
+        // Chama o nosso novo serviço de API
         ResultadoOtimizadoDTO resultadoGoogle = googleMapsService.otimizarRota(origem, destino, waypoints);
 
         // Extrai os dados reais da resposta
@@ -139,14 +145,14 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
         // 5. Salvar Rota
         Rota rotaSugerida = new Rota();
         rotaSugerida.setNomeRota(tipo == TipoServico.IDA ? "Sugestão Rota de IDA" : "Sugestão Rota de VOLTA");
-        rotaSugerida.setDistanciaKm(distanciaKm);
-        rotaSugerida.setTempoEstimadoMin(tempoMin);
-        rotaSugerida.setSolicitacao(solicitacao);
+        rotaSugerida.setDistanciaKm(distanciaKm); // <-- Dado real
+        rotaSugerida.setTempoEstimadoMin(tempoMin); // <-- Dado real
+        rotaSugerida.setSolicitacao(solicitacao); // LIGA A ROTA À SOLICITACAO
         Rota rotaSalva = rotaRepository.save(rotaSugerida);
 
         // 6. Salvar Pontos
-        for (Ponto ponto : pontosOrdenados) {
-            ponto.setRota(rotaSalva);
+        for (Ponto ponto : pontosOrdenados) { // <-- Pontos reais e ordenados
+            ponto.setRota(rotaSalva); // LIGA O PONTO À ROTA
             pontoRepository.save(ponto);
         }
 

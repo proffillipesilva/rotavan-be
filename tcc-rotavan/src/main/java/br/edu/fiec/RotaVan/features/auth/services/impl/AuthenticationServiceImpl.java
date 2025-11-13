@@ -12,9 +12,7 @@ import br.edu.fiec.RotaVan.features.user.models.Escolas;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 import br.edu.fiec.RotaVan.features.user.models.User;
-// IMPORT FALTANTE (ADICIONADO)
 import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
-// IMPORT FALTANTE (ADICIONADO)
 import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.EscolasRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.UserRepository;
@@ -36,34 +34,45 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
-    // CAMPOS FALTANTES (ADICIONADOS)
     private final MotoristasRepository motoristasRepository;
     private final ResponsaveisRepository responsaveisRepository;
 
 
-    // CONSTRUTOR ATUALIZADO
     public AuthenticationServiceImpl(UserRepository userRepository, EscolasRepository escolasRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, MotoristasRepository motoristasRepository, ResponsaveisRepository responsaveisRepository) {
         this.userRepository = userRepository;
         this.escolasRepository = escolasRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        // LINHAS ADICIONADAS
         this.motoristasRepository = motoristasRepository;
         this.responsaveisRepository = responsaveisRepository;
     }
 
+    // --- INÍCIO DA REATORAÇÃO (Passo 4) ---
+
+    /**
+     * Método helper privado para criar um objeto User básico.
+     * Centraliza a lógica de criação de User (nome, email, senha criptografada, role).
+     */
+    private User criarUserBase(String nome, String email, String senhaPura, User.Role role) {
+        User user = new User();
+        user.setNome(nome);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(senhaPura));
+        user.setRole(role);
+        return user;
+    }
+
     @Override
     @Transactional
-    // MÉTODO RENOMEADO (era "register")
     public LoginResponse registerResponsavel(RegisterRequest request) {
-        // 1. Criar o User
-        User user = new User();
-        user.setNome(request.getNomeResponsavel()); // Preenche o novo campo 'nome'
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(User.Role.ROLE_RESPONSAVEL);
+        // 1. Criar o User (usando o helper)
+        User user = criarUserBase(
+                request.getNomeResponsavel(),
+                request.getEmail(),
+                request.getPassword(),
+                User.Role.ROLE_RESPONSAVEL
+        );
 
         // 2. Criar o Perfil do Responsável
         Responsaveis responsavelProfile = new Responsaveis();
@@ -102,6 +111,62 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
+    public LoginResponse registerMotorista(MotoristaRegisterRequest request) {
+        // 1. Criar o User com a role de Motorista (usando o helper)
+        User user = criarUserBase(
+                request.getNomeMotorista(),
+                request.getEmail(),
+                request.getPassword(),
+                User.Role.ROLE_MOTORISTA
+        );
+
+        // 2. Criar o Perfil do Motorista
+        Motoristas motoristaProfile = new Motoristas();
+        motoristaProfile.setNomeMotorista(request.getNomeMotorista());
+        motoristaProfile.setCnh(request.getCnh());
+        motoristaProfile.setCpf(request.getCpf());
+        motoristaProfile.setValCnh(request.getValCnh());
+
+        // 3. Ligar o User ao Perfil
+        user.setMotoristaProfile(motoristaProfile);
+        motoristaProfile.setUser(user);
+
+        // 4. Salvar o User (o perfil será salvo em cascata)
+        userRepository.save(user);
+        motoristasRepository.save(motoristaProfile); // Salva explicitamente
+
+        // 5. Gerar e retornar o token
+        String token = jwtService.generateTokenComplete(user);
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse registerAdmin(AdminRegisterRequest request) {
+        // 1. Criar o User com a role de Admin (usando o helper)
+        User user = criarUserBase(
+                request.getNome(),
+                request.getEmail(),
+                request.getPassword(),
+                User.Role.ROLE_ADMIN
+        );
+
+        // 2. Salvar o User (não há perfil extra para o admin)
+        userRepository.save(user);
+
+        // 3. Gerar e retornar o token
+        String token = jwtService.generateTokenComplete(user);
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        return response;
+    }
+
+    // --- FIM DA REATORAÇÃO ---
+
+    @Override
     public LoginResponse login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -116,61 +181,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return response;
     }
 
-    @Override
-    @Transactional
-    public LoginResponse registerMotorista(MotoristaRegisterRequest request) {
-        // 1. Criar o User com a role de Motorista
-        User user = new User();
-        user.setNome(request.getNomeMotorista());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(User.Role.ROLE_MOTORISTA);
-
-        // 2. Criar o Perfil do Motorista
-        Motoristas motoristaProfile = new Motoristas();
-        motoristaProfile.setNomeMotorista(request.getNomeMotorista());
-        motoristaProfile.setCnh(request.getCnh()); // Tipo String
-        motoristaProfile.setCpf(request.getCpf()); // Tipo String
-        motoristaProfile.setValCnh(request.getValCnh());
-
-        // 3. Ligar o User ao Perfil
-        user.setMotoristaProfile(motoristaProfile);
-        motoristaProfile.setUser(user);
-
-        // 4. Salvar o User (o perfil será salvo em cascata)
-        // Precisamos salvar o motoristaProfile também se a cascata não estiver no User
-        userRepository.save(user);
-        motoristasRepository.save(motoristaProfile); // Salva explicitamente
-
-        // 5. Gerar e retornar o token
-        String token = jwtService.generateTokenComplete(user);
-        LoginResponse response = new LoginResponse();
-        response.setToken(token);
-        return response;
-    }
-
-    @Override
-    @Transactional
-    public LoginResponse registerAdmin(AdminRegisterRequest request) {
-        // 1. Criar o User com a role de Admin
-        User user = new User();
-        user.setNome(request.getNome());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(User.Role.ROLE_ADMIN);
-
-        // 2. Salvar o User (não há perfil extra para o admin)
-        userRepository.save(user);
-
-        // 3. Gerar e retornar o token
-        String token = jwtService.generateTokenComplete(user);
-        LoginResponse response = new LoginResponse();
-        response.setToken(token);
-        return response;
-    }
-
-    @Override
-    public LoginResponse register(RegisterRequest request) {
-        return null;
-    }
 }

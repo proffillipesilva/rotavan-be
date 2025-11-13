@@ -3,6 +3,7 @@ package br.edu.fiec.RotaVan.features.user.services.impl;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
 import br.edu.fiec.RotaVan.features.user.services.MotoristasService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public class MotoristasServiceImpl implements MotoristasService {
     }
 
     @Override
-    public Optional<Motoristas> findById(UUID id) {
-        return motoristasRepository.findById(id);
+    public Motoristas findById(UUID id) {
+        return motoristasRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Motorista não encontrado com ID: " + id));
     }
 
     @Override

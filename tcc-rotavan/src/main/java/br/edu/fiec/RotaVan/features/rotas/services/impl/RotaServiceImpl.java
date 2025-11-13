@@ -8,6 +8,7 @@ import br.edu.fiec.RotaVan.features.rotas.services.RotaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.beans.factory.annotation.Value; // <-- 1. IMPORTAÇÃO ADICIONADA
 
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,13 @@ import java.util.UUID;
 public class RotaServiceImpl implements RotaService {
 
     private final RotaRepository rotaRepository;
-    private final PontoRepository pontoRepository; // Injetar PontoRepository
+    private final PontoRepository pontoRepository;
+
+    // --- CAMPO ADICIONADO (Passo 3) ---
+    @Value("${google.maps.api.key}") // <-- 2. INJETA A CHAVE DO PROPERTIES
+    private String googleMapsApiKey;
+    // --- FIM DA ADIÇÃO ---
+
 
     public RotaServiceImpl(RotaRepository rotaRepository, PontoRepository pontoRepository) {
         this.rotaRepository = rotaRepository;
@@ -85,5 +92,18 @@ public class RotaServiceImpl implements RotaService {
         return rotaRepository.findById(rotaId)
                 .map(Rota::getPontos) // Retorna a lista de pontos da rota encontrada
                 .orElse(Collections.emptyList()); // Retorna lista vazia se a rota não for encontrada
+    }
+
+    // --- MÉTODO DE EXEMPLO (Adicionado no Passo 3) ---
+    /**
+     * Exemplo de método que usaria a chave de API para o geocoding.
+     * @param endereco O endereço a ser convertido em coordenadas.
+     */
+    public void fazerGeocoding(String endereco) {
+        // A tua chave de API está pronta a ser usada através da variável:
+        System.out.println("A API Key do Google Maps é: " + this.googleMapsApiKey);
+
+        // AQUI entraria a lógica da biblioteca de Geocoding
+        // (Ex: com.google.maps.GeoApiContext)
     }
 }

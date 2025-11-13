@@ -9,14 +9,7 @@ import jakarta.validation.Valid;
 
 public interface AuthenticationService {
     LoginResponse registerResponsavel(RegisterRequest request);
-
     LoginResponse login(LoginRequest request);
-
-    // Declaração do método para registar motorista (que já tínhamos planeado)
     LoginResponse registerMotorista(MotoristaRegisterRequest request);
-
-    // MÉTODO ADICIONADO
     LoginResponse registerAdmin(AdminRegisterRequest request);
-
-    LoginResponse register(@Valid RegisterRequest request);
 }

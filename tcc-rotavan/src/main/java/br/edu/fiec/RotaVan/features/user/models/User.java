@@ -1,5 +1,6 @@
 package br.edu.fiec.RotaVan.features.user.models;
 
+import io.swagger.v3.oas.annotations.media.Schema; // <-- IMPORTAÇÃO ADICIONADA
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,6 +40,14 @@ public class User implements UserDetails {
     @Column
     private String fcmToken;
     // --- FIM DO CAMPO FCM ---
+
+    // --- INÍCIO DA CORREÇÃO ---
+    @Column
+    @Schema(description = "Endereço principal do usuário (usado para Motorista).",
+            example = "Rua do Motorista, 500, Indaiatuba-SP")
+    private String endereco;
+    // --- FIM DA CORREÇÃO ---
+
 
     // Relacionamento Um-para-Um com o perfil do Responsável
     // cascade = CascadeType.ALL: Se o User for apagado, o perfil também é.

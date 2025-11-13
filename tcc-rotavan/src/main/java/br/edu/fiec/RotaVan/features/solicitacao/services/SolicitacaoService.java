@@ -8,11 +8,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SolicitacaoService {
-    // PASSO 1 e 2
+
+    // Este é o método correto que implementamos
     Solicitacao criarSolicitacaoEGerarRotas(SolicitacaoRequestDTO request);
 
-    // PASSO 4
+    // Este método é para o motorista tomar a decisão
     Solicitacao decidirSolicitacao(UUID solicitacaoId, DecisaoRequestDTO request);
 
+    // Este método é usado pelo controller para buscar as rotas
     Optional<Solicitacao> findById(UUID id);
+
+    // --- CORREÇÃO: O método duplicado "criarSolicitacaoComRotas" foi removido ---
 }

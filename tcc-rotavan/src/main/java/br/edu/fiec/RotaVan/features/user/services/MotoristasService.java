@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface MotoristasService {
     List<Motoristas> findAll();
-    Optional<Motoristas> findById(UUID id);
+    Motoristas findById(UUID id);
     Motoristas save(Motoristas motorista);
     Optional<Motoristas> update(UUID id, Motoristas motoristaDetails);
     boolean deleteById(UUID id);

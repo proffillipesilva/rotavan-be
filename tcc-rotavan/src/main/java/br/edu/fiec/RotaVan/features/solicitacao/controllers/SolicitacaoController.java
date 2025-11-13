@@ -43,6 +43,7 @@ public class SolicitacaoController {
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
     public ResponseEntity<Solicitacao> criarSolicitacao(@Valid @RequestBody SolicitacaoRequestDTO request) {
+        // Esta é a chamada correta para o método que implementamos
         Solicitacao solicitacao = solicitacaoService.criarSolicitacaoEGerarRotas(request);
         return new ResponseEntity<>(solicitacao, HttpStatus.CREATED);
     }
@@ -62,12 +63,13 @@ public class SolicitacaoController {
     public ResponseEntity<List<Rota>> getRotasDaSolicitacao(
             @Parameter(description = "ID (UUID) da solicitação.", required = true)
             @PathVariable UUID id) {
-        // Busca a solicitação e retorna a lista de rotas dela
-        // (O seu SolicitacaoRepository pode precisar de um findById)
-        // Esta é uma implementação simples; o ideal é o serviço buscar:
+
         Solicitacao solicitacao = solicitacaoService.findById(id).orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
         return ResponseEntity.ok(solicitacao.getRotasSugeridas());
     }
+
+    // --- CORREÇÃO: O @PostMapping duplicado abaixo foi removido ---
+    // (Ele chamava o método "criarSolicitacaoComRotas" que vamos remover)
 
     /**
      * PASSO 3 e 4: Motorista Aceita ou Recusa.
@@ -91,7 +93,4 @@ public class SolicitacaoController {
         Solicitacao solicitacao = solicitacaoService.decidirSolicitacao(id, request);
         return ResponseEntity.ok(solicitacao);
     }
-
-    // TODO: Adicionar um GET para o motorista listar todas as solicitações PENDENTES
-    // Ex: @GetMapping("/motorista/{motoristaId}/pendentes")
 }
