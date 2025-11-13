@@ -9,21 +9,26 @@ import br.edu.fiec.RotaVan.features.user.dto.MyUserResponse;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 import br.edu.fiec.RotaVan.features.user.models.User;
+import br.edu.fiec.RotaVan.features.user.repositories.CriancaRepository;
+import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
+import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.UserRepository;
 import br.edu.fiec.RotaVan.features.user.services.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final MotoristasRepository motoristasRepository;
+    private final CriancaRepository criancaRepository;
+    private final ResponsaveisRepository responsaveisRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public UserDetailsService userDetailsService() {
@@ -53,14 +58,14 @@ public class UserServiceImpl implements UserService {
 
         switch (user.getRole()) {
             case ROLE_RESPONSAVEL:
-                Responsaveis responsavel = user.getResponsavelProfile();
+                Responsaveis responsavel = responsaveisRepository.findByUser(user).orElseThrow();
                 if (responsavel != null) {
                     response.setCpfResponsavel(responsavel.getCpfResponsavel());
                     response.setEnderecoCasa(responsavel.getEnderecoCasa());
                 }
                 break;
             case ROLE_MOTORISTA:
-                Motoristas motorista = user.getMotoristaProfile();
+                Motoristas motorista = motoristasRepository.findByUser(user).orElseThrow();
                 if (motorista != null) {
                     response.setCnh(motorista.getCnh());
                     response.setCpfMotorista(motorista.getCpf());

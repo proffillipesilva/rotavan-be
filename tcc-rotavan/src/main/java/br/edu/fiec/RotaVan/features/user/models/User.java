@@ -49,15 +49,6 @@ public class User implements UserDetails {
     // --- FIM DA CORREÇÃO ---
 
 
-    // Relacionamento Um-para-Um com o perfil do Responsável
-    // cascade = CascadeType.ALL: Se o User for apagado, o perfil também é.
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Responsaveis responsavelProfile;
-
-    // Relacionamento Um-para-Um com o perfil do Motorista
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Motoristas motoristaProfile;
-
 
     // Métodos da Interface UserDetails
     @Override

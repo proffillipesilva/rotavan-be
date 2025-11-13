@@ -26,10 +26,10 @@ public class AuthController {
     }
 
 
-    @PostMapping("/register/responsavel") // <-- CORRIGIDO
-    public ResponseEntity<LoginResponse> registerResponsavel(@Valid @RequestBody RegisterRequest request) { // <-- CORRIGIDO
+    @PostMapping("/register/responsavel")
+    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Recebida requisição para registar novo responsável com email: {}", request.getEmail());
-        LoginResponse response = authenticationService.registerResponsavel(request); // <-- CORRIGIDO
+        LoginResponse response = authenticationService.register(request);
         log.info("Responsável registado com sucesso para o email: {}", request.getEmail());
         return ResponseEntity.ok(response);
     }

@@ -12,4 +12,6 @@ public interface AuthenticationService {
     LoginResponse login(LoginRequest request);
     LoginResponse registerMotorista(MotoristaRegisterRequest request);
     LoginResponse registerAdmin(AdminRegisterRequest request);
+
+    LoginResponse register(@Valid RegisterRequest request);
 }

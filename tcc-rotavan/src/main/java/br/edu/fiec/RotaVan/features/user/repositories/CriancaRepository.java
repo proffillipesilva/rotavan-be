@@ -1,9 +1,6 @@
 package br.edu.fiec.RotaVan.features.user.repositories;
 
-import br.edu.fiec.RotaVan.features.user.models.Crianca;
-import br.edu.fiec.RotaVan.features.user.models.Escolas;
-import br.edu.fiec.RotaVan.features.user.models.Motoristas;
-import br.edu.fiec.RotaVan.features.user.models.TipoServico;
+import br.edu.fiec.RotaVan.features.user.models.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,4 +35,6 @@ public interface CriancaRepository extends JpaRepository<Crianca, UUID> {
     );
 
     // --- FIM DO CÓDIGO ADICIONADO ---
+
+
 }

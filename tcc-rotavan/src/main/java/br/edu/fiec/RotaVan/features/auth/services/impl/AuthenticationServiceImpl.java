@@ -96,8 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         responsavelProfile.setCriancas(criancasList);
 
-        // 4. Ligar o User ao Perfil
-        user.setResponsavelProfile(responsavelProfile);
+
         responsavelProfile.setUser(user);
 
         // 5. Salvar o User (o perfil e as crianças serão salvas em cascata)
@@ -128,8 +127,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         motoristaProfile.setCpf(request.getCpf());
         motoristaProfile.setValCnh(request.getValCnh());
 
-        // 3. Ligar o User ao Perfil
-        user.setMotoristaProfile(motoristaProfile);
+
         motoristaProfile.setUser(user);
 
         // 4. Salvar o User (o perfil será salvo em cascata)
@@ -162,6 +160,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         LoginResponse response = new LoginResponse();
         response.setToken(token);
         return response;
+    }
+
+    @Override
+    public LoginResponse register(RegisterRequest request) {
+        return null;
     }
 
     // --- FIM DA REATORAÇÃO ---
