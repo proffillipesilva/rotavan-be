@@ -79,6 +79,7 @@ public class User implements UserDetails {
     public enum Role {
         ROLE_RESPONSAVEL,
         ROLE_MOTORISTA,
-        ROLE_ADMIN
+        ROLE_ADMIN,
+        ROLE_ESCOLA
     }
 }

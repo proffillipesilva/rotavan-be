@@ -64,5 +64,4 @@ public class Crianca {
     @Schema(description = "Define o tipo de serviço de transporte contratado.",
             example = "IDA_E_VOLTA")
     private TipoServico tipoServico;
-    // --- FIM DOS CAMPOS ADICIONADOS ---
 }

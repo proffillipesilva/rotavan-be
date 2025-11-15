@@ -1,4 +1,4 @@
-package br.edu.fiec.RotaVan.features.contratos.models; // Exemplo de pacote
+package br.edu.fiec.RotaVan.features.contratos.models;
 
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;

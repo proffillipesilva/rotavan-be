@@ -7,6 +7,7 @@ import br.edu.fiec.RotaVan.features.auth.dto.LoginResponse;
 import br.edu.fiec.RotaVan.features.auth.dto.MotoristaRegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.RegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.services.AuthenticationService;
+import br.edu.fiec.RotaVan.features.user.dto.EscolaRegisterRequest; // <-- IMPORTADO
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Escolas;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
@@ -161,6 +162,40 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         response.setToken(token);
         return response;
     }
+
+    // --- MÉTODO NOVO ADICIONADO (PASSO 5) ---
+    @Override
+    @Transactional
+    public LoginResponse registerEscola(EscolaRegisterRequest request) {
+        // 1. Criar o User com a role de Escola
+        User user = criarUserBase(
+                request.getNome(), // O nome do User será o nome da Escola
+                request.getEmail(),
+                request.getPassword(),
+                User.Role.ROLE_ESCOLA // Usando a nova Role
+        );
+
+        // 2. Criar o Perfil da Escola
+        Escolas escolaProfile = new Escolas();
+        escolaProfile.setNome(request.getNome());
+        escolaProfile.setCnpj(request.getCnpj());
+        escolaProfile.setEndereco(request.getEndereco());
+        escolaProfile.setTelefone(request.getTelefone());
+
+        // 3. Ligar o perfil ao User
+        escolaProfile.setUser(user);
+
+        // 4. Salvar o User e o Perfil
+        userRepository.save(user);
+        escolasRepository.save(escolaProfile); // Salva o perfil da escola explicitamente
+
+        // 5. Gerar e retornar o token
+        String token = jwtService.generateTokenComplete(user);
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        return response;
+    }
+    // --- FIM DA ADIÇÃO ---
 
     @Override
     public LoginResponse register(RegisterRequest request) {

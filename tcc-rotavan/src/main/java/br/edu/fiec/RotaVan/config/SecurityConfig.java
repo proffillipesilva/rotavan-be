@@ -42,24 +42,24 @@ public class SecurityConfig  {
                         // ----- INÍCIO DAS MUDANÇAS -----
 
                         // 1. Endpoints de Autenticação PÚBLICOS
-                        // Apenas login e registo de responsável são permitidos publicamente.
+                        // Adicionamos o registo de escola
                         .requestMatchers(
                                 "/v1/api/auth/login",
-                                "/v1/api/auth/register/responsavel"
+                                "/v1/api/auth/register/responsavel",
+                                "/v1/api/auth/register/escola" // <-- ADICIONADO AQUI
                         ).permitAll()
 
-                        // 2. Endpoints de Autenticação PROTEGIDOS
-                        // Apenas um ADMIN pode registar um novo motorista ou admin.
+                        // 2. Endpoints de Autenticação PROTEGIDOS (Admin)
                         .requestMatchers(
                                 "/v1/api/auth/register/motorista",
                                 "/v1/api/auth/register/admin"
                         ).hasRole("ADMIN") // <-- ESTA É A PROTEÇÃO!
 
                         // 3. Outros Endpoints Públicos
-                        // Mantém as outras regras que já tinhas (Swagger, vans, etc.)
+                        // REMOVEMOS /escolas/** desta lista
                         .requestMatchers(
                                 "/v1/api/vans/**",
-                                "/escolas/**",
+                                // "/escolas/**", // <-- REMOVIDO DAQUI
                                 "/images/**",
                                 "/v1/api/notifications/**",
                                 "/swagger-ui/**",
@@ -69,6 +69,8 @@ public class SecurityConfig  {
                         // ----- FIM DAS MUDANÇAS -----
 
                         // 4. Regra Final: Todo o resto precisa de autenticação
+                        // Como /escolas/** não está em permitAll,
+                        // ele agora cai nesta regra e exige login.
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

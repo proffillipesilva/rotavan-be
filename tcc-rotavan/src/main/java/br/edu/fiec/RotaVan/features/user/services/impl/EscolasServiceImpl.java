@@ -41,6 +41,7 @@ public class EscolasServiceImpl implements EscolasService {
                     existingEscola.setCnpj(escolaDetails.getCnpj());
                     existingEscola.setEndereco(escolaDetails.getEndereco());
                     existingEscola.setTelefone(escolaDetails.getTelefone());
+                    existingEscola.setEmail(escolaDetails.getEmail()); // <-- ADICIONE ESTA LINHA
                     return escolasRepository.save(existingEscola);
                 });
     }

@@ -1,14 +1,32 @@
 package br.edu.fiec.RotaVan.features.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email; // <-- IMPORTAR
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-@Schema(description = "DTO (Data Transfer Object) para o registo de uma nova Escola.")
+@Schema(description = "DTO (Data Transfer Object) para o registo de uma nova Escola (com login).") // <-- Descrição atualizada
 public class EscolaRegisterRequest {
 
+    // --- ADICIONADO: Campos de Login (para User) ---
+    @NotBlank(message = "O email não pode estar em branco")
+    @Email(message = "Forneça um endereço de email válido")
+    @Schema(description = "Email de login da escola.",
+            example = "contato@escolaexemplo.com",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    private String email;
+
+    @NotBlank(message = "A senha não pode estar em branco")
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
+    @Schema(description = "Senha de acesso (mínimo 6 caracteres).",
+            example = "senhaforte123",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    private String password;
+    // --- FIM DA ADIÇÃO ---
+
+    // --- Campos de Perfil (para Escolas) ---
     @NotBlank(message = "O nome da escola não pode estar em branco")
     @Schema(description = "Nome oficial da escola.",
             example = "Colégio Exemplo de Indaiatuba",

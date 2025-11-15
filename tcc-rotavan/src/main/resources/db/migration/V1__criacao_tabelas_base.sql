@@ -43,10 +43,12 @@ CREATE TABLE escolas (
     nome VARCHAR(255),
     endereco VARCHAR(255),
     cnpj VARCHAR(255),
-    telefone VARCHAR(255),      -- <-- ADICIONE ESTA LINHA
+    telefone VARCHAR(255),
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
-    PRIMARY KEY (id)
+    user_id BINARY(16),
+    PRIMARY KEY (id),
+    CONSTRAINT FK_Escolas_User FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- 5. Tabela de Criança

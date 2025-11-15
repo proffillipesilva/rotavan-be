@@ -1,7 +1,9 @@
 package br.edu.fiec.RotaVan.features.user.models;
 
-import io.swagger.v3.oas.annotations.media.Schema; // 1. IMPORTAR O SCHEMA
+import com.fasterxml.jackson.annotation.JsonIgnore; // <-- 1. ADICIONAR IMPORT
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+// import jakarta.validation.constraints.Email; // <-- REMOVER IMPORT (se existir)
 import lombok.Data;
 import java.util.UUID;
 
@@ -16,6 +18,20 @@ public class Escolas {
     @Schema(description = "ID único da escola (UUID).",
             example = "e1a2b3c4-d5e6-f789-0123-456789abcdef")
     private UUID id;
+
+    // --- 2. LIGAÇÃO COM USER (ADICIONADO) ---
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Schema(description = "Referência interna ao usuário (User) associado (ignorado no JSON).")
+    private User user;
+    // --- FIM DA ADIÇÃO ---
+
+    // --- 3. CAMPO REMOVIDO ---
+    // @Email
+    // @Column(nullable = false, unique = true)
+    // private String email; // <-- REMOVIDO (O email agora fica na entidade User)
+    // --- FIM DA REMOÇÃO ---
 
     @Column(nullable = false)
     @Schema(description = "Nome oficial da escola.",
