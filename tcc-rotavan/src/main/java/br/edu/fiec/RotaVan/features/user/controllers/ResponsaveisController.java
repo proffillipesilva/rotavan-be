@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+// import java.util.ArrayList; // <-- Não é mais necessário
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +41,8 @@ public class ResponsaveisController {
     })
     @PostMapping
     public ResponseEntity<Responsaveis> createResponsavel(@RequestBody Responsaveis responsavel) {
-        // O código Java não muda, mas o JSON enviado no Postman agora deve conter a lista de crianças.
+        // NOTA: Este endpoint parece ser legado (pré-DTOs). O registo real
+        // acontece no AuthController (/auth/register/responsavel).
         Responsaveis savedResponsavel = responsaveisService.criaResponsavel(responsavel);
         return new ResponseEntity<>(savedResponsavel, HttpStatus.CREATED);
     }
@@ -56,7 +57,7 @@ public class ResponsaveisController {
             @ApiResponse(responseCode = "404", description = "Responsável não encontrado com o ID (UUID) fornecido."),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
-    @SecurityRequirement(name = "bearerAuth") // Provavelmente precisa de login
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/{responsavelId}/criancas")
     public ResponseEntity<Crianca> adicionarCrianca(
 
@@ -122,32 +123,27 @@ public class ResponsaveisController {
     }
 
 
+    // --- MÉTODO CORRIGIDO ---
+    @Operation(summary = "Lista os dependentes do responsável logado",
+            description = "Retorna uma lista de todos os dependentes (crianças) associados ao responsável que está autenticado.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de dependentes retornada com sucesso."),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado."),
+            @ApiResponse(responseCode = "404", description = "Perfil de responsável não encontrado para o usuário logado."),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/dependentes")
     public ResponseEntity<List<CriancaDTO>> getDependentes(Authentication authentication) {
         // 1. Obtém o objeto 'User' do utilizador que fez a requisição.
         User user = (User) authentication.getPrincipal();
 
-
-        // 2. Chama o serviço para montar a resposta com os dados do perfil.
-        //MyUserResponse response = userService.getMe(user);
+        // 2. Chama o serviço para buscar os dependentes REAIS
+        List<CriancaDTO> criancaDTOS = responsaveisService.findDependentesByAuthUser(user);
 
         // 3. Retorna os dados com um status HTTP 200 OK.
-        List<CriancaDTO> criancaDTOS = new ArrayList<>();
-        criancaDTOS.add(CriancaDTO.builder()
-                        .nome("Maria")
-                        .escola("Rute")
-                        .idade(10)
-                        .id(1)
-                        .nivel("5 ano")
-                .build());
-        criancaDTOS.add(CriancaDTO.builder()
-                .nome("Jose")
-                .escola("Rute")
-                .id(2)
-                .idade(12)
-                .nivel("7 ano")
-                .build());
         return ResponseEntity.ok(criancaDTOS);
     }
+    // --- FIM DA CORREÇÃO ---
 
 }

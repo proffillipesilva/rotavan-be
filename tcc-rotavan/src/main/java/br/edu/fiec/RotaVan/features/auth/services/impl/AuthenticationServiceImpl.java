@@ -92,6 +92,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 crianca.setNome(dto.getNome());
                 crianca.setEscola(escola);
                 crianca.setResponsavel(responsavelProfile);
+                crianca.setDataNascimento(dto.getDataNascimento());
+                crianca.setNivelEscolar(dto.getNivelEscolar());
+                crianca.setEndereco(dto.getEndereco());
+                crianca.setTipoServico(dto.getTipoServico());
+                crianca.setPeriodo(dto.getPeriodo());
+                crianca.setLatitude(dto.getLatitude());
+                crianca.setLongitude(dto.getLongitude());
                 criancasList.add(crianca);
             }
         }

@@ -58,10 +58,10 @@ CREATE TABLE crianca (
     endereco VARCHAR(255),
     data_nascimento DATE,
     periodo VARCHAR(50),
-    nivel_escolar VARCHAR(100),
-    telefone VARCHAR(255),      -- <-- ADICIONE ESTA LINHA
+    nivel_escolar VARCHAR(100),    -- <-- ADICIONE ESTA LINHA
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
+    tipo_servico VARCHAR(50),
     responsavel_id BINARY(16),
     escola_id BINARY(16),
     PRIMARY KEY (id),

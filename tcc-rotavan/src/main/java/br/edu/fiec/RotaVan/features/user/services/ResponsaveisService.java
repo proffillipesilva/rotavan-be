@@ -1,7 +1,9 @@
 package br.edu.fiec.RotaVan.features.user.services;
 
+import br.edu.fiec.RotaVan.features.user.dto.CriancaDTO;
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
+import br.edu.fiec.RotaVan.features.user.models.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +26,6 @@ public interface ResponsaveisService {
 
     // Em ResponsaveisService.java
     Optional<Responsaveis> update(UUID id, Responsaveis responsavelDetails);
+
+    List<CriancaDTO> findDependentesByAuthUser(User user);
 }
