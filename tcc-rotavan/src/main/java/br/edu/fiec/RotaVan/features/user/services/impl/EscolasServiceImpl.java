@@ -20,6 +20,7 @@ public class EscolasServiceImpl implements EscolasService {
 
     @Override
     public Escolas save(Escolas escola) {
+        // Este 'save' agora é usado apenas pelo AuthenticationService
         return escolasRepository.save(escola);
     }
 
@@ -41,7 +42,7 @@ public class EscolasServiceImpl implements EscolasService {
                     existingEscola.setCnpj(escolaDetails.getCnpj());
                     existingEscola.setEndereco(escolaDetails.getEndereco());
                     existingEscola.setTelefone(escolaDetails.getTelefone());
-                    existingEscola.setEmail(escolaDetails.getEmail()); // <-- ADICIONE ESTA LINHA
+
                     return escolasRepository.save(existingEscola);
                 });
     }
