@@ -1,7 +1,10 @@
 package br.edu.fiec.RotaVan.features.user.controllers; // Verifique se o pacote está correto
 
+import br.edu.fiec.RotaVan.features.user.dto.CriancaDTO;
+import br.edu.fiec.RotaVan.features.user.dto.MyUserResponse;
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
+import br.edu.fiec.RotaVan.features.user.models.User;
 import br.edu.fiec.RotaVan.features.user.services.ResponsaveisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,8 +14,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -114,6 +119,35 @@ public class ResponsaveisController {
         return responsaveisService.update(id, responsavelDetails)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @GetMapping("/dependentes")
+    public ResponseEntity<List<CriancaDTO>> getDependentes(Authentication authentication) {
+        // 1. Obtém o objeto 'User' do utilizador que fez a requisição.
+        User user = (User) authentication.getPrincipal();
+
+
+        // 2. Chama o serviço para montar a resposta com os dados do perfil.
+        //MyUserResponse response = userService.getMe(user);
+
+        // 3. Retorna os dados com um status HTTP 200 OK.
+        List<CriancaDTO> criancaDTOS = new ArrayList<>();
+        criancaDTOS.add(CriancaDTO.builder()
+                        .nome("Maria")
+                        .escola("Rute")
+                        .idade(10)
+                        .id(1)
+                        .nivel("5 ano")
+                .build());
+        criancaDTOS.add(CriancaDTO.builder()
+                .nome("Jose")
+                .escola("Rute")
+                .id(2)
+                .idade(12)
+                .nivel("7 ano")
+                .build());
+        return ResponseEntity.ok(criancaDTOS);
     }
 
 }

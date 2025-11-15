@@ -94,4 +94,5 @@ public class UserController {
         // 3. Retorna os dados com um status HTTP 200 OK.
         return ResponseEntity.ok(response);
     }
+
 }
