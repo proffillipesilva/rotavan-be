@@ -38,6 +38,7 @@ public class RegisterRequest {
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String cpfResponsavel;
 
+    @NotBlank(message = "O endereço nao pode estar em branco")
     @Schema(description = "Endereço residencial principal do responsável.",
             example = "Rua das Flores, 123, Bairro Feliz, Indaiatuba-SP",
             requiredMode = Schema.RequiredMode.REQUIRED)

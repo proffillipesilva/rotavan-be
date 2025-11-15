@@ -23,7 +23,7 @@ public class EscolaRegisterRequest {
     @Schema(description = "Senha de acesso (mínimo 6 caracteres).",
             example = "senhaforte123",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private String password;
+    private String senha;
     // --- FIM DA ADIÇÃO ---
 
     // --- Campos de Perfil (para Escolas) ---
@@ -45,8 +45,9 @@ public class EscolaRegisterRequest {
             example = "Avenida Principal, 1000, Centro, Indaiatuba-SP",
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String endereco;
-
-    @Schema(description = "Telefone principal de contato da escola (Opcional).",
-            example = "1938887766")
-    private String telefone;
 }
+
+//    @Schema(description = "Telefone principal de contato da escola (Opcional).",
+//            example = "1938887766")
+//    private String telefone;
+//}

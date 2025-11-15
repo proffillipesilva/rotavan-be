@@ -1,8 +1,11 @@
 package br.edu.fiec.RotaVan.features.user.models;
 
-import io.swagger.v3.oas.annotations.media.Schema; // <-- IMPORTAÇÃO ADICIONADA
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,8 +15,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users") // Usar um nome de tabela diferente de "user" que pode ser uma palavra reservada
-@Data // Garante que getters, setters, etc., são gerados pelo Lombok
+@Table(name = "users")
+@Getter
+@Setter
+@ToString(exclude = {"responsavelProfile", "motoristaProfile"}) // evita loop no toString()
 public class User implements UserDetails {
 
     @Id
@@ -27,30 +32,38 @@ public class User implements UserDetails {
     private String password;
 
     @Column
-    private String nome; // CAMPO ADICIONADO previamente
+    private String nome;
 
-    @Enumerated(EnumType.STRING) // Guarda o nome do enum (ex: "ROLE_RESPONSAVEL") em vez de um número
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     @Column
     private String picture;
 
-    // --- CAMPO FCM ADICIONADO ---
     @Column
     private String fcmToken;
-    // --- FIM DO CAMPO FCM ---
 
-    // --- INÍCIO DA CORREÇÃO ---
     @Column
-    @Schema(description = "Endereço principal do usuário (usado para Motorista).",
-            example = "Rua do Motorista, 500, Indaiatuba-SP")
+    @Schema(
+            description = "Endereço principal do usuário (usado para Motorista).",
+            example = "Rua do Motorista, 500, Indaiatuba-SP"
+    )
     private String endereco;
-    // --- FIM DA CORREÇÃO ---
 
+    // -------- RELAÇÃO COM RESPONSÁVEL --------
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore // evita loop na hora de serializar /me
+    private Responsaveis responsavelProfile;
 
+    // -------- RELAÇÃO COM MOTORISTA --------
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Motoristas motoristaProfile;
 
-    // Métodos da Interface UserDetails
+    // ===============================
+    // MÉTODOS DA INTERFACE UserDetails
+    // ===============================
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -58,11 +71,9 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        // O email é usado como username para autenticação
         return email;
     }
 
-    // Estes métodos podem retornar true por padrão se não precisar de lógica extra
     @Override
     public boolean isAccountNonExpired() { return true; }
 
@@ -75,7 +86,7 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() { return true; }
 
-    // Enumeração para os papéis (Roles) dos utilizadores
+    // Enum de papéis
     public enum Role {
         ROLE_RESPONSAVEL,
         ROLE_MOTORISTA,

@@ -19,7 +19,7 @@ public class Responsaveis {
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     @JsonIgnore
     @Schema(description = "Referência interna ao usuário (User) associado (ignorado no JSON).")
     private User user;

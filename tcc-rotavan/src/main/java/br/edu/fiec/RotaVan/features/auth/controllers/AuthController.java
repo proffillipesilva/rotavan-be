@@ -28,9 +28,9 @@ public class AuthController {
 
 
     @PostMapping("/register/responsavel")
-    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<LoginResponse> registerResponsavel(@Valid @RequestBody RegisterRequest request) {
         log.info("Recebida requisição para registar novo responsável com email: {}", request.getEmail());
-        LoginResponse response = authenticationService.register(request);
+        LoginResponse response = authenticationService.registerResponsavel(request);
         log.info("Responsável registado com sucesso para o email: {}", request.getEmail());
         return ResponseEntity.ok(response);
     }

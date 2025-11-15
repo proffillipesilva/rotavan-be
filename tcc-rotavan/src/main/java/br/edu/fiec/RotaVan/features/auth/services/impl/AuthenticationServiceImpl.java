@@ -97,11 +97,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         responsavelProfile.setCriancas(criancasList);
 
-
+        // 4. Ligar o User ao Perfil
         responsavelProfile.setUser(user);
 
         // 5. Salvar o User (o perfil e as crianças serão salvas em cascata)
         userRepository.save(user);
+        responsaveisRepository.save(responsavelProfile);
 
         // 6. Gerar e retornar o token
         String token = jwtService.generateTokenComplete(user);
@@ -128,7 +129,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         motoristaProfile.setCpf(request.getCpf());
         motoristaProfile.setValCnh(request.getValCnh());
 
-
+        // 3. Ligar o User ao Perfil
         motoristaProfile.setUser(user);
 
         // 4. Salvar o User (o perfil será salvo em cascata)
@@ -171,7 +172,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = criarUserBase(
                 request.getNome(), // O nome do User será o nome da Escola
                 request.getEmail(),
-                request.getPassword(),
+                request.getSenha(),
                 User.Role.ROLE_ESCOLA // Usando a nova Role
         );
 
@@ -180,7 +181,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         escolaProfile.setNome(request.getNome());
         escolaProfile.setCnpj(request.getCnpj());
         escolaProfile.setEndereco(request.getEndereco());
-        escolaProfile.setTelefone(request.getTelefone());
+//        escolaProfile.setTelefone(request.getTelefone());
 
         // 3. Ligar o perfil ao User
         escolaProfile.setUser(user);
