@@ -1,4 +1,4 @@
--- 1. Tabela de Usuários (Base para Responsável e Motorista)
+-- 1. Tabela de Usuários
 CREATE TABLE users (
     id BINARY(16) NOT NULL,
     email VARCHAR(255) NOT NULL,
@@ -7,6 +7,7 @@ CREATE TABLE users (
     role VARCHAR(50) NOT NULL,
     picture VARCHAR(255),
     fcm_token VARCHAR(255),
+    endereco VARCHAR(255), -- Adicionado campo endereço no User
     PRIMARY KEY (id),
     UNIQUE KEY UK_user_email (email)
 );
@@ -21,7 +22,7 @@ CREATE TABLE responsaveis (
     endereco_casa VARCHAR(255),
     user_id BINARY(16),
     PRIMARY KEY (id),
-    CONSTRAINT FK_Responsaveis_User FOREIGN KEY (user_id) REFERENCES users(id) -- <-- CORRIGIDO
+    CONSTRAINT FK_Responsaveis_User FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- 3. Tabela de Motoristas
@@ -34,7 +35,7 @@ CREATE TABLE motoristas (
     cpf VARCHAR(255),
     user_id BINARY(16),
     PRIMARY KEY (id),
-    CONSTRAINT FK_Motoristas_User FOREIGN KEY (user_id) REFERENCES users(id) -- <-- CORRIGIDO
+    CONSTRAINT FK_Motoristas_User FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- 4. Tabela de Escolas
@@ -58,7 +59,7 @@ CREATE TABLE crianca (
     endereco VARCHAR(255),
     data_nascimento DATE,
     periodo VARCHAR(50),
-    nivel_escolar VARCHAR(100),    -- <-- ADICIONE ESTA LINHA
+    nivel_escolar VARCHAR(100),
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     tipo_servico VARCHAR(50),
@@ -76,10 +77,10 @@ CREATE TABLE veiculos (
     modelo VARCHAR(255),
     ano INT,
     capacidade INT,
-    fk_motorista BINARY(16), -- <-- CORRIGIDO
+    fk_motorista BINARY(16),
     PRIMARY KEY (id),
     UNIQUE KEY UK_veiculo_placa (placa),
-    CONSTRAINT FK_Veiculo_Motorista FOREIGN KEY (fk_motorista) REFERENCES motoristas(id) -- <-- CORRIGIDO
+    CONSTRAINT FK_Veiculo_Motorista FOREIGN KEY (fk_motorista) REFERENCES motoristas(id)
 );
 
 -- 7. Tabela de Contrato
@@ -89,52 +90,69 @@ CREATE TABLE contratos (
     data_fim DATE,
     valor_mensal DECIMAL(19, 2),
     status VARCHAR(50),
-    fk_motorista BINARY(16),    -- <-- CORRIGIDO
-    fk_responsavel BINARY(16),  -- <-- CORRIGIDO
+    fk_motorista BINARY(16),
+    fk_responsavel BINARY(16),
     PRIMARY KEY (id),
     CONSTRAINT FK_Contrato_Motorista FOREIGN KEY (fk_motorista) REFERENCES motoristas(id),
     CONSTRAINT FK_Contrato_Responsavel FOREIGN KEY (fk_responsavel) REFERENCES responsaveis(id)
 );
 
--- 8. Tabela de Rotas (Sem a fk_solicitacao, que será adicionada no V2)
+-- 8. Tabela de Solicitação (NOVA - NECESSÁRIA PARA A ROTA)
+CREATE TABLE solicitacao (
+    id BINARY(16) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    fk_responsavel BINARY(16),
+    fk_dependente BINARY(16),
+    fk_motorista BINARY(16),
+    fk_escola BINARY(16),
+    PRIMARY KEY (id),
+    CONSTRAINT FK_Solicitacao_Responsavel FOREIGN KEY (fk_responsavel) REFERENCES responsaveis(id),
+    CONSTRAINT FK_Solicitacao_Crianca FOREIGN KEY (fk_dependente) REFERENCES crianca(id),
+    CONSTRAINT FK_Solicitacao_Motorista FOREIGN KEY (fk_motorista) REFERENCES motoristas(id),
+    CONSTRAINT FK_Solicitacao_Escola FOREIGN KEY (fk_escola) REFERENCES escolas(id)
+);
+
+-- 9. Tabela de Rotas
 CREATE TABLE rotas (
     id BINARY(16) NOT NULL,
     nome_rota VARCHAR(255),
     descricao VARCHAR(255),
     distancia_km DECIMAL(19, 2),
     tempo_estimado_min INT,
+    tipo VARCHAR(50),
     motorista_id BINARY(16),
+    fk_solicitacao BINARY(16),
     PRIMARY KEY (id),
-    CONSTRAINT FK_Rota_Motorista FOREIGN KEY (motorista_id) REFERENCES motoristas(id)
+    CONSTRAINT FK_Rota_Motorista FOREIGN KEY (motorista_id) REFERENCES motoristas(id),
+    CONSTRAINT FK_Rota_Solicitacao FOREIGN KEY (fk_solicitacao) REFERENCES solicitacao(id)
 );
 
--- 9. Tabela de Ponto
+-- 10. Tabela de Ponto
 CREATE TABLE pontos (
     id BINARY(16) NOT NULL,
     nome_ponto VARCHAR(255),
+    endereco VARCHAR(255), -- Adicionado
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     ordem INT,
-    fk_rota BINARY(16),         -- <-- CORRIGIDO
+    fk_rota BINARY(16),
     PRIMARY KEY (id),
-    CONSTRAINT FK_Pontos_Rota FOREIGN KEY (fk_rota) REFERENCES rotas(id) -- <-- CORRIGIDO
+    CONSTRAINT FK_Pontos_Rota FOREIGN KEY (fk_rota) REFERENCES rotas(id)
 );
 
--- 10. Tabela de Viagem
--- 10. Tabela de Viagem
+-- 11. Tabela de Viagem
 CREATE TABLE viagens (
     id BINARY(16) NOT NULL,
     data_viagem DATE NOT NULL,
-    hora_saida TIME NOT NULL,        -- <-- ADICIONADO
-    hora_chegada TIME,               -- <-- ADICIONADO
+    hora_saida TIME NOT NULL,
+    hora_chegada TIME,
     status VARCHAR(50),
-    tipo_viagem VARCHAR(50),         -- <-- Verifique se você ainda usa este campo no Java
-    fk_dependente BINARY(16) NOT NULL, -- <-- ADICIONADO
-    fk_motorista BINARY(16) NOT NULL,  -- <-- ADICIONADO
-    fk_rota BINARY(16) NOT NULL,       -- <-- RENOMEADO (era rota_id)
+    tipo_viagem VARCHAR(50),
+    fk_dependente BINARY(16) NOT NULL,
+    fk_motorista BINARY(16) NOT NULL,
+    fk_rota BINARY(16) NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT FK_Viagens_Rota FOREIGN KEY (fk_rota) REFERENCES rotas(id), -- <-- RENOMEADO
-    CONSTRAINT FK_Viagens_Crianca FOREIGN KEY (fk_dependente) REFERENCES crianca(id), -- <-- ADICIONADO
-    CONSTRAINT FK_Viagens_Motorista FOREIGN KEY (fk_motorista) REFERENCES motoristas(id) -- <-- ADICIONADO
-);
+    CONSTRAINT FK_Viagens_Rota FOREIGN KEY (fk_rota) REFERENCES rotas(id),
+    CONSTRAINT FK_Viagens_Crianca FOREIGN KEY (fk_dependente) REFERENCES crianca(id),
+    CONSTRAINT FK_Viagens_Motorista FOREIGN KEY (fk_motorista) REFERENCES motoristas(id)
 );

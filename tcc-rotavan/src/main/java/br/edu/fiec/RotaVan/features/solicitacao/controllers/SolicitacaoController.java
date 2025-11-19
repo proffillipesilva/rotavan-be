@@ -19,12 +19,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+// import java.util.UUID; // <-- Removido pois não usamos mais UUID
 
 @RestController
 @RequestMapping("/v1/api/solicitacoes")
 @AllArgsConstructor
 @Tag(name = "Solicitações", description = "API para o fluxo de solicitação de vaga (Responsável -> Motorista)")
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "bearerAuth") // Garante o cadeado no Swagger
 public class SolicitacaoController {
 
     private final SolicitacaoService solicitacaoService;
@@ -37,13 +38,12 @@ public class SolicitacaoController {
             description = "Endpoint para o Responsável criar uma nova solicitação de vaga para um Motorista.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Solicitação criada com sucesso, rotas sugeridas geradas."),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos na requisição (ex: IDs faltando)."),
-            @ApiResponse(responseCode = "401", description = "Usuário (Responsável) não autenticado."),
-            @ApiResponse(responseCode = "404", description = "Motorista, Dependente ou Escola não encontrados com os IDs fornecidos."),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos na requisição (ex: IDs em falta)."),
+            @ApiResponse(responseCode = "401", description = "Utilizador (Responsável) não autenticado."),
+            @ApiResponse(responseCode = "404", description = "Motorista, Dependente ou Escola não encontrados."),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
     public ResponseEntity<Solicitacao> criarSolicitacao(@Valid @RequestBody SolicitacaoRequestDTO request) {
-        // Esta é a chamada correta para o método que implementamos
         Solicitacao solicitacao = solicitacaoService.criarSolicitacaoEGerarRotas(request);
         return new ResponseEntity<>(solicitacao, HttpStatus.CREATED);
     }
@@ -56,40 +56,38 @@ public class SolicitacaoController {
             description = "Endpoint para o Motorista visualizar as rotas sugeridas para uma solicitação pendente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de rotas sugeridas retornada com sucesso."),
-            @ApiResponse(responseCode = "401", description = "Usuário (Motorista) não autenticado."),
-            @ApiResponse(responseCode = "404", description = "Solicitação não encontrada com o ID fornecido."),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
+            @ApiResponse(responseCode = "401", description = "Utilizador (Motorista) não autenticado."),
+            @ApiResponse(responseCode = "404", description = "Solicitação não encontrada.")
     })
     public ResponseEntity<List<Rota>> getRotasDaSolicitacao(
-            @Parameter(description = "ID (UUID) da solicitação.", required = true)
+            @Parameter(description = "ID (Integer) da solicitação.", required = true)
             @PathVariable UUID id) {
 
-        Solicitacao solicitacao = solicitacaoService.findById(id).orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
+        // Atenção: O seu SolicitacaoService também deve esperar Integer no findById
+        Solicitacao solicitacao = solicitacaoService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
         return ResponseEntity.ok(solicitacao.getRotasSugeridas());
     }
-
-    // --- CORREÇÃO: O @PostMapping duplicado abaixo foi removido ---
-    // (Ele chamava o método "criarSolicitacaoComRotas" que vamos remover)
 
     /**
      * PASSO 3 e 4: Motorista Aceita ou Recusa.
      */
     @PatchMapping("/{id}/decisao")
     @Operation(summary = "Aceita ou Recusa uma solicitação (Motorista)",
-            description = "Endpoint para o Motorista tomar uma decisão (ACEITA ou RECUSADA) sobre uma solicitação.")
+            description = "Endpoint para o Motorista tomar uma decisão (ACEITA ou RECUSADA).")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Decisão registrada com sucesso, status da solicitação atualizado."),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos na requisição (ex: status de decisão inválido)."),
-            @ApiResponse(responseCode = "401", description = "Usuário (Motorista) não autenticado."),
-            @ApiResponse(responseCode = "404", description = "Solicitação não encontrada com o ID fornecido."),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
+            @ApiResponse(responseCode = "200", description = "Decisão registada com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Status de decisão inválido."),
+            @ApiResponse(responseCode = "401", description = "Utilizador (Motorista) não autenticado."),
+            @ApiResponse(responseCode = "404", description = "Solicitação não encontrada.")
     })
     public ResponseEntity<Solicitacao> decidirSolicitacao(
-            @Parameter(description = "ID (UUID) da solicitação a ser decidida.", required = true)
+            @Parameter(description = "ID (Integer) da solicitação a ser decidida.", required = true)
             @PathVariable UUID id,
 
             @Valid @RequestBody DecisaoRequestDTO request) {
 
+        // Atenção: O seu SolicitacaoService também deve esperar Integer aqui
         Solicitacao solicitacao = solicitacaoService.decidirSolicitacao(id, request);
         return ResponseEntity.ok(solicitacao);
     }

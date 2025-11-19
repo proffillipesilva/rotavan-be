@@ -1,4 +1,4 @@
-package br.edu.fiec.RotaVan.features.contratos.repositories; // Ajuste o pacote se necessário
+package br.edu.fiec.RotaVan.features.contratos.repositories;
 
 import br.edu.fiec.RotaVan.features.contratos.models.Contrato;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
@@ -11,7 +11,9 @@ import java.util.UUID;
 
 @Repository
 public interface ContratoRepository extends JpaRepository<Contrato, UUID> {
-    // Exemplos de métodos personalizados:
+
+    // Estes métodos permitem buscar listas de contratos pelos objetos relacionados
     List<Contrato> findByResponsavel(Responsaveis responsavel);
+
     List<Contrato> findByMotorista(Motoristas motorista);
 }

@@ -1,81 +1,80 @@
-package br.edu.fiec.RotaVan.features.rotas.services.impl; // Ajuste o pacote
+package br.edu.fiec.RotaVan.features.rotas.services.impl;
 
 import br.edu.fiec.RotaVan.features.rotas.models.Ponto;
-import br.edu.fiec.RotaVan.features.rotas.models.Rota;
 import br.edu.fiec.RotaVan.features.rotas.repositories.PontoRepository;
 import br.edu.fiec.RotaVan.features.rotas.services.PontoService;
+import br.edu.fiec.RotaVan.shared.service.GoogleMapsService;
+import com.google.maps.model.LatLng;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.Comparator; // Para ordenar
-import java.util.stream.Collectors; // Para ordenar
 
 @Service
 public class PontoServiceImpl implements PontoService {
 
     private final PontoRepository pontoRepository;
+    private final GoogleMapsService googleMapsService;
 
-    public PontoServiceImpl(PontoRepository pontoRepository) {
+    public PontoServiceImpl(PontoRepository pontoRepository, GoogleMapsService googleMapsService) {
         this.pontoRepository = pontoRepository;
+        this.googleMapsService = googleMapsService;
     }
 
     @Override
-    @Transactional
-    public Ponto save(Ponto ponto) {
-        // Poderia adicionar validações aqui, ex: verificar se a rota existe
+    public Ponto criarPonto(Ponto ponto) {
+        preencherCoordenadasSeNecessario(ponto);
         return pontoRepository.save(ponto);
     }
 
     @Override
-    public Optional<Ponto> findById(UUID id) {
-        return pontoRepository.findById(id);
+    public List<Ponto> listarPontos() {
+        return pontoRepository.findAll();
     }
 
     @Override
-    public List<Ponto> findByRota(Rota rota) {
-        // O Spring Data JPA pode gerar este método se definido na interface PontoRepository
-        // return pontoRepository.findByRota(rota);
-        // Ou implementar manualmente se necessário
-        return pontoRepository.findAll().stream()
-                .filter(p -> p.getRota() != null && p.getRota().getId().equals(rota.getId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Ponto> findByRotaIdOrderByOrdemAsc(UUID rotaId) {
-        // Exemplo buscando todos e filtrando/ordenando na memória.
-        // Idealmente, crie um método no PontoRepository: List<Ponto> findByRotaIdOrderByOrdemAsc(UUID rotaId);
-        return pontoRepository.findAll().stream()
-                .filter(p -> p.getRota() != null && p.getRota().getId().equals(rotaId))
-                .sorted(Comparator.comparing(Ponto::getOrdem))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public Optional<Ponto> update(UUID id, Ponto pontoDetails) {
+    public Ponto buscarPontoPorId(UUID id) {
         return pontoRepository.findById(id)
-                .map(existingPonto -> {
-                    existingPonto.setLongitude(pontoDetails.getLongitude());
-                    existingPonto.setLatitude(pontoDetails.getLatitude());
-                    existingPonto.setNomePonto(pontoDetails.getNomePonto());
-                    existingPonto.setOrdem(pontoDetails.getOrdem());
-                    // Não alteramos a rota aqui geralmente, isso seria outra operação
-                    return pontoRepository.save(existingPonto);
-                });
+                .orElseThrow(() -> new RuntimeException("Ponto não encontrado"));
     }
 
     @Override
-    @Transactional
-    public boolean deleteById(UUID id) {
-        if (pontoRepository.existsById(id)) {
-            pontoRepository.deleteById(id);
-            return true;
+    public Ponto atualizarPonto(UUID id, Ponto pontoAtualizado) {
+        Ponto pontoExistente = buscarPontoPorId(id);
+        pontoExistente.setNome(pontoAtualizado.getNome());
+        pontoExistente.setEndereco(pontoAtualizado.getEndereco());
+
+        if (pontoAtualizado.getLatitude() != null && pontoAtualizado.getLongitude() != null) {
+            pontoExistente.setLatitude(pontoAtualizado.getLatitude());
+            pontoExistente.setLongitude(pontoAtualizado.getLongitude());
+        } else {
+            preencherCoordenadasSeNecessario(pontoExistente);
         }
-        return false;
+        return pontoRepository.save(pontoExistente);
+    }
+
+    @Override
+    public void deletarPonto(UUID id) {
+        Ponto ponto = buscarPontoPorId(id);
+        pontoRepository.delete(ponto);
+    }
+
+    private void preencherCoordenadasSeNecessario(Ponto ponto) {
+        if (ponto.getEndereco() != null && !ponto.getEndereco().isEmpty()) {
+            boolean semLat = ponto.getLatitude() == null || ponto.getLatitude() == 0.0;
+            boolean semLng = ponto.getLongitude() == null || ponto.getLongitude() == 0.0;
+
+            if (semLat || semLng) {
+                try {
+                    LatLng coords = googleMapsService.buscarCoordenadas(ponto.getEndereco());
+                    if (coords != null) {
+                        ponto.setLatitude(coords.lat);
+                        ponto.setLongitude(coords.lng);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro Geocoding: " + e.getMessage());
+                }
+            }
+        }
     }
 }
