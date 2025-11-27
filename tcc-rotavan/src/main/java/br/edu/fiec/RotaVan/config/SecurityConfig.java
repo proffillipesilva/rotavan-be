@@ -44,12 +44,8 @@ public class SecurityConfig  {
                                 "/v1/api/auth/login",
                                 "/v1/api/auth/register/responsavel",
                                 "/v1/api/auth/register/escola",
-                                "/v1/api/auth/register/motorista", // Recomendação: Deixe público para facilitar testes
-
-                                // --- ATENÇÃO: ---
-                                // Deixamos público TEMPORARIAMENTE para você criar o primeiro usuário.
-                                // Depois de criar o admin, você pode comentar esta linha ou movê-la para baixo.
-                                "/v1/api/auth/register/admin"
+                                "/v1/api/auth/register/motorista",
+                                "/v1/api/auth/register/admin" // Temporário
                         ).permitAll()
 
                         // 3. Recursos Estáticos e Documentação (Swagger)
@@ -62,9 +58,7 @@ public class SecurityConfig  {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // 4. Endpoints Protegidos (Apenas Admin)
-                        // (Se quiser voltar a bloquear a criação de admin depois, descomente a linha abaixo e remova de cima)
-                        // .requestMatchers("/v1/api/auth/register/admin").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/escolas/**").permitAll()
 
                         // 5. Regra Final: Tudo o resto exige token válido
                         .anyRequest().authenticated()

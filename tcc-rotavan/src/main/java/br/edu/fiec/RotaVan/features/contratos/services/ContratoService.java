@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface ContratoService {
 
     // --- CRUD para o Controller ---
-    Contrato save(Contrato contrato); // <--- O ERRO ERA A FALTA OU NÃO VISIBILIDADE DESTE MÉTODO
+    Contrato save(Contrato contrato);
 
     List<Contrato> findAll();
 

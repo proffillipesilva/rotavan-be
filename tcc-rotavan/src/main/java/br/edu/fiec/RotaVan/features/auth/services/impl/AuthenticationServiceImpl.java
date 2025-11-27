@@ -7,7 +7,7 @@ import br.edu.fiec.RotaVan.features.auth.dto.LoginResponse;
 import br.edu.fiec.RotaVan.features.auth.dto.MotoristaRegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.dto.RegisterRequest;
 import br.edu.fiec.RotaVan.features.auth.services.AuthenticationService;
-import br.edu.fiec.RotaVan.features.user.dto.EscolaRegisterRequest; // <-- IMPORTADO
+import br.edu.fiec.RotaVan.features.user.dto.EscolaRegisterRequest;
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Escolas;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
@@ -17,18 +17,25 @@ import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.EscolasRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.UserRepository;
+import br.edu.fiec.RotaVan.shared.service.GoogleMapsService; // IMPORTADO
 import br.edu.fiec.RotaVan.utils.JwtService;
+import com.google.maps.model.LatLng; // IMPORTADO
+import org.slf4j.Logger; // IMPORTADO
+import org.slf4j.LoggerFactory; // IMPORTADO
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal; // IMPORTADO
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class); // Logger Adicionado
 
     private final UserRepository userRepository;
     private final EscolasRepository escolasRepository;
@@ -37,9 +44,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final MotoristasRepository motoristasRepository;
     private final ResponsaveisRepository responsaveisRepository;
+    private final GoogleMapsService googleMapsService; // Serviço Injetado
 
-
-    public AuthenticationServiceImpl(UserRepository userRepository, EscolasRepository escolasRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, MotoristasRepository motoristasRepository, ResponsaveisRepository responsaveisRepository) {
+    // Construtor Atualizado
+    public AuthenticationServiceImpl(
+            UserRepository userRepository,
+            EscolasRepository escolasRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            AuthenticationManager authenticationManager,
+            MotoristasRepository motoristasRepository,
+            ResponsaveisRepository responsaveisRepository,
+            GoogleMapsService googleMapsService) { // Parâmetro Adicionado
         this.userRepository = userRepository;
         this.escolasRepository = escolasRepository;
         this.passwordEncoder = passwordEncoder;
@@ -47,9 +63,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.authenticationManager = authenticationManager;
         this.motoristasRepository = motoristasRepository;
         this.responsaveisRepository = responsaveisRepository;
+        this.googleMapsService = googleMapsService; // Inicialização
     }
-
-    // --- INÍCIO DA REATORAÇÃO (Passo 4) ---
 
     /**
      * Método helper privado para criar um objeto User básico.
@@ -97,8 +112,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 crianca.setEndereco(dto.getEndereco());
                 crianca.setTipoServico(dto.getTipoServico());
                 crianca.setPeriodo(dto.getPeriodo());
-                crianca.setLatitude(dto.getLatitude());
-                crianca.setLongitude(dto.getLongitude());
+
+                // --- LÓGICA DE GEOCODING AUTOMÁTICO ---
+                // Caso 1: Se o front já enviou coordenadas, usamos elas
+                if (dto.getLatitude() != null && dto.getLongitude() != null) {
+                    crianca.setLatitude(dto.getLatitude());
+                    crianca.setLongitude(dto.getLongitude());
+                }
+                // Caso 2: Se não enviou, mas tem endereço, buscamos no Google
+                else if (dto.getEndereco() != null && !dto.getEndereco().isEmpty()) {
+                    try {
+                        LatLng coords = googleMapsService.buscarCoordenadas(dto.getEndereco());
+                        if (coords != null) {
+                            // Converter double (Google) para BigDecimal (Banco)
+                            crianca.setLatitude(BigDecimal.valueOf(coords.lat));
+                            crianca.setLongitude(BigDecimal.valueOf(coords.lng));
+                            log.info("Coordenadas convertidas para a criança {}: {}, {}", dto.getNome(), coords.lat, coords.lng);
+                        }
+                    } catch (Exception e) {
+                        // Logamos erro mas não paramos o cadastro
+                        log.error("Erro ao buscar coordenadas para o endereço: {}", dto.getEndereco(), e);
+                    }
+                }
+                // --------------------------------------
+
                 criancasList.add(crianca);
             }
         }
@@ -121,7 +158,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public LoginResponse registerMotorista(MotoristaRegisterRequest request) {
-        // 1. Criar o User com a role de Motorista (usando o helper)
+        // 1. Criar o User com a role de Motorista
         User user = criarUserBase(
                 request.getNomeMotorista(),
                 request.getEmail(),
@@ -141,7 +178,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // 4. Salvar o User (o perfil será salvo em cascata)
         userRepository.save(user);
-        motoristasRepository.save(motoristaProfile); // Salva explicitamente
+        motoristasRepository.save(motoristaProfile);
 
         // 5. Gerar e retornar o token
         String token = jwtService.generateTokenComplete(user);
@@ -153,7 +190,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public LoginResponse registerAdmin(AdminRegisterRequest request) {
-        // 1. Criar o User com a role de Admin (usando o helper)
+        // 1. Criar o User com a role de Admin
         User user = criarUserBase(
                 request.getNome(),
                 request.getEmail(),
@@ -161,7 +198,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 User.Role.ROLE_ADMIN
         );
 
-        // 2. Salvar o User (não há perfil extra para o admin)
+        // 2. Salvar o User
         userRepository.save(user);
 
         // 3. Gerar e retornar o token
@@ -171,7 +208,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return response;
     }
 
-    // --- MÉTODO NOVO ADICIONADO (PASSO 5) ---
     @Override
     @Transactional
     public LoginResponse registerEscola(EscolaRegisterRequest request) {
@@ -180,7 +216,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 request.getNome(), // O nome do User será o nome da Escola
                 request.getEmail(),
                 request.getSenha(),
-                User.Role.ROLE_ESCOLA // Usando a nova Role
+                User.Role.ROLE_ESCOLA
         );
 
         // 2. Criar o Perfil da Escola
@@ -188,14 +224,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         escolaProfile.setNome(request.getNome());
         escolaProfile.setCnpj(request.getCnpj());
         escolaProfile.setEndereco(request.getEndereco());
-//        escolaProfile.setTelefone(request.getTelefone());
+        // escolaProfile.setTelefone(request.getTelefone());
 
         // 3. Ligar o perfil ao User
         escolaProfile.setUser(user);
 
         // 4. Salvar o User e o Perfil
         userRepository.save(user);
-        escolasRepository.save(escolaProfile); // Salva o perfil da escola explicitamente
+        escolasRepository.save(escolaProfile);
 
         // 5. Gerar e retornar o token
         String token = jwtService.generateTokenComplete(user);
@@ -203,14 +239,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         response.setToken(token);
         return response;
     }
-    // --- FIM DA ADIÇÃO ---
 
     @Override
     public LoginResponse register(RegisterRequest request) {
         return null;
     }
-
-    // --- FIM DA REATORAÇÃO ---
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -226,5 +259,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         response.setToken(token);
         return response;
     }
-
 }

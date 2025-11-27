@@ -136,7 +136,7 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
         return solicitacaoRepository.findAll();
     }
 
-    // Método auxiliar para tratar erros de notificação sem parar o fluxo principal
+
     private void enviarNotificacaoSegura(UUID userId, String titulo, String mensagem) {
         try {
             NotificationMessage msg = NotificationMessage.builder()
