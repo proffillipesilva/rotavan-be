@@ -30,7 +30,7 @@ public class ContratoServiceImpl implements ContratoService {
     @Override
     @Transactional
     public Contrato save(Contrato contrato) {
-        // Validações básicas
+        // Validações
         if (contrato.getDataInicio() != null && contrato.getDataFim() != null &&
                 contrato.getDataFim().isBefore(contrato.getDataInicio())) {
             throw new IllegalArgumentException("Data final não pode ser anterior à data inicial.");
@@ -91,6 +91,7 @@ public class ContratoServiceImpl implements ContratoService {
         Contrato novoContrato = new Contrato();
         novoContrato.setResponsavel(responsavel);
         novoContrato.setMotorista(motorista);
+        // novoContrato.setCrianca(crianca); // Descomente se tiver adicionado o campo na entidade
         novoContrato.setDataInicio(LocalDate.now());
         novoContrato.setDataFim(LocalDate.now().plusMonths(12));
         novoContrato.setStatus("ATIVO");
