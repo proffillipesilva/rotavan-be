@@ -1676,3 +1676,8 @@ Caused by: java.sql.SQLSyntaxErrorException: Unknown database 'rotavan'
 2025-11-27 20:33:33.494 [http-nio-5000-exec-2] INFO  b.e.f.R.c.LoggingAspect - >>>> Controller INÍCIO: br.edu.fiec.RotaVan.features.user.controllers.EscolasController.uploadCsv()
 2025-11-27 20:33:33.494 [http-nio-5000-exec-2] INFO  b.e.f.R.c.LoggingAspect - >>>> Argumentos: [org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@127d243e]
 2025-11-27 20:33:33.561 [http-nio-5000-exec-2] INFO  b.e.f.R.c.LoggingAspect - <<<< Controller FIM: br.edu.fiec.RotaVan.features.user.controllers.EscolasController.uploadCsv() - SUCESSO
+2025-11-27 20:39:54.710 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.t.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-11-27 20:39:54.714 [tomcat-shutdown] INFO  o.s.b.w.e.t.GracefulShutdown - Graceful shutdown complete
+2025-11-27 20:39:54.719 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-11-27 20:39:54.720 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-11-27 20:39:54.724 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.

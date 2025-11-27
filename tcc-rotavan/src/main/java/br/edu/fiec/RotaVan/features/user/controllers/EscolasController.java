@@ -78,4 +78,16 @@ public class EscolasController {
             return ResponseEntity.internalServerError().body("Erro ao importar: " + e.getMessage());
         }
     }
+
+    @Operation(summary = "Sincronizar Coordenadas",
+            description = "Percorre todas as escolas sem latitude/longitude e busca no Google Maps.")
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/sincronizar-coords")
+    public ResponseEntity<String> sincronizarCoordenadas() {
+        // Precisará fazer um cast ou adicionar o método na Interface EscolasService primeiro
+        // O ideal é adicionar void sincronizarCoordenadas(); na Interface EscolasService.java
+        ((br.edu.fiec.RotaVan.features.user.services.impl.EscolasServiceImpl) escolasService).sincronizarCoordenadas();
+
+        return ResponseEntity.ok("Sincronização iniciada! Verifique os logs ou o banco em instantes.");
+    }
 }
