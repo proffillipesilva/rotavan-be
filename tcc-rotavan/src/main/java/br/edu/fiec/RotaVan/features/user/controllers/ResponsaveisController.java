@@ -1,6 +1,7 @@
 package br.edu.fiec.RotaVan.features.user.controllers; // Verifique se o pacote está correto
 
 import br.edu.fiec.RotaVan.features.user.dto.CriancaDTO;
+import br.edu.fiec.RotaVan.features.user.dto.CriancaRequestDTO;
 import br.edu.fiec.RotaVan.features.user.dto.MyUserResponse;
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
@@ -58,15 +59,15 @@ public class ResponsaveisController {
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping("/{responsavelId}/criancas")
+    @PostMapping("/dependentes/criancas")
     public ResponseEntity<Crianca> adicionarCrianca(
+            Authentication authentication,
+            @RequestBody CriancaRequestDTO novaCrianca) {
 
-            @Parameter(description = "ID (UUID) do responsável que receberá o dependente.", required = true)
-            @PathVariable UUID responsavelId,
 
-            @RequestBody Crianca novaCrianca) {
+        User user = (User) authentication.getPrincipal();
 
-        return responsaveisService.adicionarCrianca(responsavelId, novaCrianca)
+        return responsaveisService.adicionarCrianca(user, novaCrianca)
                 .map(crianca -> new ResponseEntity<>(crianca, HttpStatus.CREATED))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -133,7 +134,7 @@ public class ResponsaveisController {
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/dependentes")
+    @GetMapping("/dependentes/criancas")
     public ResponseEntity<List<CriancaDTO>> getDependentes(Authentication authentication) {
         // 1. Obtém o objeto 'User' do utilizador que fez a requisição.
         User user = (User) authentication.getPrincipal();
@@ -143,6 +144,20 @@ public class ResponsaveisController {
 
         // 3. Retorna os dados com um status HTTP 200 OK.
         return ResponseEntity.ok(criancaDTOS);
+    }
+    // --- FIM DA CORREÇÃO ---
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/dependentes/criancas/{id}")
+    public ResponseEntity<CriancaDTO> getDependentes(Authentication authentication, @PathVariable("id") UUID id) {
+        // 1. Obtém o objeto 'User' do utilizador que fez a requisição.
+        User user = (User) authentication.getPrincipal();
+
+        // 2. Chama o serviço para buscar os dependentes REAIS
+        CriancaDTO criancaDTO = responsaveisService.findDependentesById(user, id);
+
+        // 3. Retorna os dados com um status HTTP 200 OK.
+        return ResponseEntity.ok(criancaDTO);
     }
     // --- FIM DA CORREÇÃO ---
 
