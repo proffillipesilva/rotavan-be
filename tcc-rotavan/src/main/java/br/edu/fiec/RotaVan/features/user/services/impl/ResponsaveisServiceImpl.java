@@ -1,12 +1,16 @@
 package br.edu.fiec.RotaVan.features.user.services.impl;
 
 import br.edu.fiec.RotaVan.features.user.dto.CriancaDTO;
+import br.edu.fiec.RotaVan.features.user.dto.CriancaRequestDTO;
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
+import br.edu.fiec.RotaVan.features.user.models.Escolas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 import br.edu.fiec.RotaVan.features.user.models.User;
 import br.edu.fiec.RotaVan.features.user.repositories.CriancaRepository;
+import br.edu.fiec.RotaVan.features.user.repositories.EscolasRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
 import br.edu.fiec.RotaVan.features.user.services.ResponsaveisService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,15 +20,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class ResponsaveisServiceImpl implements ResponsaveisService {
 
     private final ResponsaveisRepository responsaveisRepository;
     private final CriancaRepository criancaRepository;
-
-    public ResponsaveisServiceImpl(ResponsaveisRepository responsaveisRepository, CriancaRepository criancaRepository) {
-        this.responsaveisRepository = responsaveisRepository;
-        this.criancaRepository = criancaRepository;
-    }
+    private final EscolasRepository escolasRepository;
 
     @Override
     @Transactional
@@ -49,10 +50,20 @@ public class ResponsaveisServiceImpl implements ResponsaveisService {
 
     @Override
     @Transactional
-    public Optional<Crianca> adicionarCrianca(UUID responsavelId, Crianca novaCrianca) {
-        return responsaveisRepository.findById(responsavelId).map(responsavel -> {
-            novaCrianca.setResponsavel(responsavel);
-            return criancaRepository.save(novaCrianca);
+    public Optional<Crianca> adicionarCrianca(User user, CriancaRequestDTO novaCrianca) {
+
+        Escolas escola =  escolasRepository.findById(UUID.fromString(novaCrianca.getEscolaId())).orElseThrow();
+        Crianca criancaBanco = new Crianca();
+        criancaBanco.setNome(novaCrianca.getNome());
+        criancaBanco.setEndereco(novaCrianca.getEndereco());
+        criancaBanco.setNivelEscolar(novaCrianca.getNivelEscolar());
+        criancaBanco.setDataNascimento(novaCrianca.getDataNascimento());
+        criancaBanco.setEscola(escola);
+        Crianca crianca = criancaRepository.save(criancaBanco);
+
+        return responsaveisRepository.findByUser(user).map(responsavel -> {
+            crianca.setResponsavel(responsavel);
+            return criancaRepository.save(crianca);
         });
     }
 
@@ -80,6 +91,18 @@ public class ResponsaveisServiceImpl implements ResponsaveisService {
         return responsavel.getCriancas().stream()
                 .map(this::convertCriancaToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CriancaDTO findDependentesById(User user, UUID id) {
+        Responsaveis responsavel = responsaveisRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Perfil de responsável não encontrado para o usuário."));
+         Crianca crianca = criancaRepository.findById(id).orElseThrow();
+         if(crianca.getResponsavel().getId().equals(responsavel.getId())){
+             return convertCriancaToDTO(crianca);
+         } else {
+             throw new RuntimeException();
+         }
     }
 
     /**
