@@ -1681,3 +1681,67 @@ Caused by: java.sql.SQLSyntaxErrorException: Unknown database 'rotavan'
 2025-11-27 20:39:54.719 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-11-27 20:39:54.720 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-11-27 20:39:54.724 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-11-27 20:39:58.156 [background-preinit] INFO  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-11-27 20:39:58.189 [restartedMain] INFO  b.e.f.R.RotaVanApplication - Starting RotaVanApplication using Java 21.0.8 with PID 11372 (C:\Users\41685\Desktop\RotaVan\tcc-rotavan\target\classes started by 41685 in C:\Users\41685\Desktop\RotaVan)
+2025-11-27 20:39:58.193 [restartedMain] INFO  b.e.f.R.RotaVanApplication - No active profile set, falling back to 1 default profile: "default"
+2025-11-27 20:39:58.226 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-11-27 20:39:58.226 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-11-27 20:39:58.731 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-11-27 20:39:58.803 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 66 ms. Found 11 JPA repository interfaces.
+2025-11-27 20:39:59.734 [restartedMain] INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat initialized with port 5000 (http)
+2025-11-27 20:39:59.744 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-5000"]
+2025-11-27 20:39:59.746 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-11-27 20:39:59.746 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-11-27 20:39:59.793 [restartedMain] INFO  o.a.c.c.C.[.[.[/] - Initializing Spring embedded WebApplicationContext
+2025-11-27 20:39:59.794 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1567 ms
+2025-11-27 20:40:00.019 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2025-11-27 20:40:00.217 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7af09146
+2025-11-27 20:40:00.218 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2025-11-27 20:40:00.247 [restartedMain] INFO  o.f.c.FlywayExecutor - Database: jdbc:mysql://localhost:3310/rotavan (MySQL 8.0)
+2025-11-27 20:40:00.288 [restartedMain] INFO  o.f.c.i.c.DbValidate - Successfully validated 1 migration (execution time 00:00.022s)
+2025-11-27 20:40:00.299 [restartedMain] INFO  o.f.c.i.c.DbMigrate - Current version of schema `rotavan`: 1
+2025-11-27 20:40:00.301 [restartedMain] INFO  o.f.c.i.c.DbMigrate - Schema `rotavan` is up to date. No migration necessary.
+2025-11-27 20:40:00.384 [restartedMain] INFO  o.h.j.i.u.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-11-27 20:40:00.414 [restartedMain] INFO  o.h.Version - HHH000412: Hibernate ORM core version 6.6.22.Final
+2025-11-27 20:40:00.442 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-11-27 20:40:00.621 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-11-27 20:40:00.663 [restartedMain] WARN  o.h.o.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-11-27 20:40:00.664 [restartedMain] WARN  o.h.o.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-11-27 20:40:00.672 [restartedMain] INFO  o.h.o.c.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-11-27 20:40:01.355 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-11-27 20:40:01.425 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-11-27 20:40:01.660 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-27 20:40:01.828 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-11-27 20:40:01.829 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-11-27 20:40:02.038 [restartedMain] INFO  o.s.d.j.r.q.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-11-27 20:40:03.247 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-11-27 20:40:03.258 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-5000"]
+2025-11-27 20:40:03.269 [restartedMain] INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat started on port 5000 (http) with context path '/'
+2025-11-27 20:40:03.275 [restartedMain] INFO  b.e.f.R.RotaVanApplication - Started RotaVanApplication in 5.331 seconds (process running for 5.941)
+2025-11-27 20:40:03.277 [restartedMain] WARN  o.s.c.e.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2025-11-27 20:40:03.277 [restartedMain] WARN  o.s.c.e.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2025-11-27 20:40:55.337 [http-nio-5000-exec-1] INFO  o.a.c.c.C.[.[.[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-11-27 20:40:55.338 [http-nio-5000-exec-1] INFO  o.s.w.s.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-11-27 20:40:55.338 [http-nio-5000-exec-1] INFO  o.s.w.s.DispatcherServlet - Completed initialization in 0 ms
+2025-11-27 20:40:55.366 [http-nio-5000-exec-1] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@43db23bc
+2025-11-27 20:40:55.442 [http-nio-5000-exec-4] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@25abf530
+2025-11-27 20:40:55.442 [http-nio-5000-exec-2] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@6fb4d397
+2025-11-27 20:40:55.442 [http-nio-5000-exec-5] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@2c20c823
+2025-11-27 20:40:55.442 [http-nio-5000-exec-6] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@18a3cd09
+2025-11-27 20:40:55.442 [http-nio-5000-exec-3] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@2488c4c
+2025-11-27 20:40:55.533 [http-nio-5000-exec-8] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@715d7126
+2025-11-27 20:40:55.534 [http-nio-5000-exec-7] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@81703e0
+2025-11-27 20:40:55.569 [http-nio-5000-exec-9] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@2b65cbdc
+2025-11-27 20:40:56.337 [http-nio-5000-exec-9] INFO  o.s.a.AbstractOpenApiResource - Init duration for springdoc-openapi is: 749 ms
+2025-11-27 20:41:03.313 [http-nio-5000-exec-10] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@1ae5f4af
+2025-11-27 20:41:15.852 [http-nio-5000-exec-1] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@46ba6475
+2025-11-27 20:41:16.071 [http-nio-5000-exec-1] INFO  b.e.f.R.c.LoggingAspect - >>>> Controller INÍCIO: br.edu.fiec.RotaVan.features.user.controllers.EscolasController.sincronizarCoordenadas()
+2025-11-27 20:41:16.071 [http-nio-5000-exec-1] INFO  b.e.f.R.c.LoggingAspect - >>>> Argumentos: []
+2025-11-27 20:41:19.195 [http-nio-5000-exec-1] INFO  b.e.f.R.c.LoggingAspect - <<<< Controller FIM: br.edu.fiec.RotaVan.features.user.controllers.EscolasController.sincronizarCoordenadas() - SUCESSO
