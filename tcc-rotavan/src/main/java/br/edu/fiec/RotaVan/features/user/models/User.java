@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -50,6 +51,12 @@ public class User implements UserDetails {
             example = "Rua do Motorista, 500, Indaiatuba-SP"
     )
     private String endereco;
+
+    @Column(precision = 10, scale = 8)
+    private BigDecimal latitude;
+
+    @Column(precision = 11, scale = 8)
+    private BigDecimal longitude;
 
     // -------- RELAÇÃO COM RESPONSÁVEL --------
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

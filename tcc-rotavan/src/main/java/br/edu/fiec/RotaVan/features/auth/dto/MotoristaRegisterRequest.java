@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import java.time.LocalDate; // IMPORTAR
+import java.time.LocalDate;
 
 @Data
-@Schema(description = "DTO (Data Transfer Object) para o registro de um novo usuário Motorista.")
+@Schema(description = "DTO (Data Transfer Object) para o registo de um novo utilizador Motorista.")
 public class MotoristaRegisterRequest {
 
     // Dados para o login (User)
@@ -34,17 +34,17 @@ public class MotoristaRegisterRequest {
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String nomeMotorista;
 
-    @NotBlank(message = "A CNH não pode estar em branco") // MUDADO DE @NotNull para @NotBlank
+    @NotBlank(message = "A CNH não pode estar em branco")
     @Schema(description = "Número da CNH do motorista.",
             example = "01234567890",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private String cnh; // MUDADO DE Long para String
+    private String cnh;
 
-    @NotBlank(message = "O CPF não pode estar em branco") // MUDADO DE @NotNull para @NotBlank
+    @NotBlank(message = "O CPF não pode estar em branco")
     @Schema(description = "CPF do motorista (somente números).",
             example = "99988877766",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private String cpf; // MUDADO DE Long para String
+    private String cpf;
 
     @NotBlank(message = "A placa do veículo não pode estar em branco")
     @Schema(description = "Placa do veículo principal do motorista (formato Mercosul ou antigo).",
@@ -52,11 +52,17 @@ public class MotoristaRegisterRequest {
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String placaVeiculo;
 
-    // --- CAMPO ADICIONADO ---
     @NotNull(message = "A data de validade da CNH não pode ser nula")
     @Schema(description = "Data de validade da CNH do motorista.",
             example = "2028-10-20",
             requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate valCnh;
-    // --- FIM DA ADIÇÃO ---
+
+    // --- CAMPO ADICIONADO PARA O ENDEREÇO ---
+    @NotBlank(message = "O endereço não pode estar em branco")
+    @Schema(description = "Endereço residencial do motorista (ponto de partida).",
+            example = "Rua das Oficinas, 200, Indaiatuba-SP",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    private String endereco;
+    // ----------------------------------------
 }
