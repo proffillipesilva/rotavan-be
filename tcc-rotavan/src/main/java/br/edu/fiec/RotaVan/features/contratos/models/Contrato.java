@@ -1,54 +1,52 @@
 package br.edu.fiec.RotaVan.features.contratos.models;
 
+import br.edu.fiec.RotaVan.features.user.models.Crianca; // Importante se tiver vínculo
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.UUID; // UUID
 
 @Entity
-@Table(name = "contratos") // Nome da tabela
+@Table(name = "contratos")
 @Data
-@Schema(description = "Representa o contrato de serviço entre um Responsável e um Motorista.")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Contrato {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Schema(description = "ID único do contrato (UUID).",
-            example = "c1a2b3c4-d5e6-f789-0123-456789contr")
     private UUID id;
 
-    @Column(name = "data_inicio", nullable = false)
-    @Schema(description = "Data de início da vigência do contrato.",
-            example = "2025-02-01",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(name = "data_inicio")
     private LocalDate dataInicio;
 
-    @Column(name = "data_fim", nullable = false)
-    @Schema(description = "Data de término da vigência do contrato.",
-            example = "2025-12-31",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(name = "data_fim")
     private LocalDate dataFim;
 
-    @Column(name = "valor_mensal", nullable = false, precision = 10, scale = 2)
-    @Schema(description = "Valor da mensalidade acordado.",
-            example = "450.50",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(name = "valor_mensal")
     private BigDecimal valorMensal;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_responsavel", nullable = false)
-    @Schema(description = "O responsável (cliente) que está contratando o serviço.",
-            requiredMode = Schema.RequiredMode.REQUIRED)
-    private Responsaveis responsavel;
+    private String status; // "ATIVO", "ENCERRADO"
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_motorista", nullable = false)
-    @Schema(description = "O motorista (prestador) que está sendo contratado.",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+    @JoinColumn(name = "fk_motorista")
+    @JsonIgnore
     private Motoristas motorista;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_responsavel")
+    @JsonIgnore
+    private Responsaveis responsavel;
+
+    // Sugestão: Adicionar vínculo com a Criança também, se fizer sentido para o seu negócio
+    @ManyToOne
+    @JoinColumn(name = "fk_crianca")
+    private Crianca crianca;
 }

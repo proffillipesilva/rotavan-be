@@ -1,17 +1,13 @@
-package br.edu.fiec.RotaVan.features.rotas.services; // Ajuste o pacote
+package br.edu.fiec.RotaVan.features.rotas.services;
 
 import br.edu.fiec.RotaVan.features.rotas.models.Ponto;
-import br.edu.fiec.RotaVan.features.rotas.models.Rota;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface PontoService {
-    Ponto save(Ponto ponto);
-    Optional<Ponto> findById(UUID id);
-    List<Ponto> findByRota(Rota rota); // Exemplo de busca específica
-    List<Ponto> findByRotaIdOrderByOrdemAsc(UUID rotaId); // Buscar pontos de uma rota ordenados
-    Optional<Ponto> update(UUID id, Ponto pontoDetails);
-    boolean deleteById(UUID id);
+    Ponto criarPonto(Ponto ponto);
+    List<Ponto> listarPontos();
+    Ponto buscarPontoPorId(UUID id);
+    Ponto atualizarPonto(UUID id, Ponto ponto);
+    void deletarPonto(UUID id);
 }

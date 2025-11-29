@@ -36,41 +36,31 @@ public class SecurityConfig  {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(this.corsConfigurationSource))
                 .authorizeHttpRequests(requests -> requests
-                        // Permite todas as requisições OPTIONS (Preflight de CORS)
+                        // 1. Permite Preflight de CORS (Essencial para o Front)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // ----- INÍCIO DAS MUDANÇAS -----
-
-                        // 1. Endpoints de Autenticação PÚBLICOS
-                        // Adicionamos o registo de escola
+                        // 2. Endpoints PÚBLICOS (Login e Registos)
                         .requestMatchers(
                                 "/v1/api/auth/login",
                                 "/v1/api/auth/register/responsavel",
-                                "/v1/api/auth/register/escola" // <-- ADICIONADO AQUI
+                                "/v1/api/auth/register/escola",
+                                "/v1/api/auth/register/motorista",
+                                "/v1/api/auth/register/admin" // Temporário
                         ).permitAll()
 
-                        // 2. Endpoints de Autenticação PROTEGIDOS (Admin)
-                        .requestMatchers(
-                                "/v1/api/auth/register/motorista",
-                                "/v1/api/auth/register/admin"
-                        ).hasRole("ADMIN") // <-- ESTA É A PROTEÇÃO!
-
-                        // 3. Outros Endpoints Públicos
-                        // REMOVEMOS /escolas/** desta lista
+                        // 3. Recursos Estáticos e Documentação (Swagger)
                         .requestMatchers(
                                 "/v1/api/vans/**",
-                                // "/escolas/**", // <-- REMOVIDO DAQUI
                                 "/images/**",
                                 "/v1/api/notifications/**",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // ----- FIM DAS MUDANÇAS -----
+                        .requestMatchers(HttpMethod.GET, "/escolas/**").permitAll()
 
-                        // 4. Regra Final: Todo o resto precisa de autenticação
-                        // Como /escolas/** não está em permitAll,
-                        // ele agora cai nesta regra e exige login.
+                        // 5. Regra Final: Tudo o resto exige token válido
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

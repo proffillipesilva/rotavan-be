@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 // import jakarta.validation.constraints.Email; // <-- REMOVER IMPORT (se existir)
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -54,5 +56,11 @@ public class Escolas {
     @Schema(description = "Telefone principal de contato da escola.",
             example = "1938887766")
     private String telefone;
+
+    @Column(precision = 10, scale = 8)
+    private BigDecimal latitude;
+
+    @Column(precision = 11, scale = 8)
+    private BigDecimal longitude;
 
 }

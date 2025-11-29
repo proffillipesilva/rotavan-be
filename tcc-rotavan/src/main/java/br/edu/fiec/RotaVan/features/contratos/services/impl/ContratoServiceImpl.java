@@ -1,51 +1,40 @@
-package br.edu.fiec.RotaVan.features.contratos.services.impl; // Ajuste o pacote
+package br.edu.fiec.RotaVan.features.contratos.services.impl;
 
 import br.edu.fiec.RotaVan.features.contratos.models.Contrato;
 import br.edu.fiec.RotaVan.features.contratos.repositories.ContratoRepository;
 import br.edu.fiec.RotaVan.features.contratos.services.ContratoService;
+import br.edu.fiec.RotaVan.features.user.models.Crianca;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
-import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository; // Necessário para buscar por ID
-import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository; // Necessário para buscar por ID
+import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
+import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ContratoServiceImpl implements ContratoService {
 
     private final ContratoRepository contratoRepository;
-    // Injetar repositórios necessários para buscar Responsavel/Motorista por ID
     private final ResponsaveisRepository responsaveisRepository;
     private final MotoristasRepository motoristasRepository;
-
-
-    public ContratoServiceImpl(ContratoRepository contratoRepository,
-                               ResponsaveisRepository responsaveisRepository,
-                               MotoristasRepository motoristasRepository) {
-        this.contratoRepository = contratoRepository;
-        this.responsaveisRepository = responsaveisRepository;
-        this.motoristasRepository = motoristasRepository;
-    }
 
     @Override
     @Transactional
     public Contrato save(Contrato contrato) {
-        // Validações: Ex: Data fim não pode ser antes da data início
-        if (contrato.getDataFim().isBefore(contrato.getDataInicio())) {
+        // Validações
+        if (contrato.getDataInicio() != null && contrato.getDataFim() != null &&
+                contrato.getDataFim().isBefore(contrato.getDataInicio())) {
             throw new IllegalArgumentException("Data final não pode ser anterior à data inicial.");
         }
-        // Verificar se Responsavel e Motorista existem antes de salvar
-        responsaveisRepository.findById(contrato.getResponsavel().getId())
-                .orElseThrow(() -> new RuntimeException("Responsável não encontrado."));
-        motoristasRepository.findById(contrato.getMotorista().getId())
-                .orElseThrow(() -> new RuntimeException("Motorista não encontrado."));
-
         return contratoRepository.save(contrato);
     }
 
@@ -61,16 +50,16 @@ public class ContratoServiceImpl implements ContratoService {
 
     @Override
     public List<Contrato> findByResponsavelId(UUID responsavelId) {
-        Optional<Responsaveis> responsavelOpt = responsaveisRepository.findById(responsavelId);
-        // O método findByResponsavel pode ser gerado no ContratoRepository
-        return responsavelOpt.map(contratoRepository::findByResponsavel).orElse(Collections.emptyList());
+        return responsaveisRepository.findById(responsavelId)
+                .map(contratoRepository::findByResponsavel)
+                .orElse(Collections.emptyList());
     }
 
     @Override
     public List<Contrato> findByMotoristaId(UUID motoristaId) {
-        Optional<Motoristas> motoristaOpt = motoristasRepository.findById(motoristaId);
-        // O método findByMotorista pode ser gerado no ContratoRepository
-        return motoristaOpt.map(contratoRepository::findByMotorista).orElse(Collections.emptyList());
+        return motoristasRepository.findById(motoristaId)
+                .map(contratoRepository::findByMotorista)
+                .orElse(Collections.emptyList());
     }
 
     @Override
@@ -78,16 +67,10 @@ public class ContratoServiceImpl implements ContratoService {
     public Optional<Contrato> update(UUID id, Contrato contratoDetails) {
         return contratoRepository.findById(id)
                 .map(existingContrato -> {
-                    if (contratoDetails.getDataFim().isBefore(contratoDetails.getDataInicio())) {
-                        throw new IllegalArgumentException("Data final não pode ser anterior à data inicial.");
-                    }
-                    existingContrato.setDataInicio(contratoDetails.getDataInicio());
-                    existingContrato.setDataFim(contratoDetails.getDataFim());
-                    existingContrato.setValorMensal(contratoDetails.getValorMensal());
-                    // Geralmente não se altera responsável ou motorista de um contrato existente,
-                    // mas se precisar, adicione aqui (com validação de existência).
-                    // existingContrato.setResponsavel(contratoDetails.getResponsavel());
-                    // existingContrato.setMotorista(contratoDetails.getMotorista());
+                    if (contratoDetails.getDataInicio() != null) existingContrato.setDataInicio(contratoDetails.getDataInicio());
+                    if (contratoDetails.getDataFim() != null) existingContrato.setDataFim(contratoDetails.getDataFim());
+                    if (contratoDetails.getValorMensal() != null) existingContrato.setValorMensal(contratoDetails.getValorMensal());
+                    if (contratoDetails.getStatus() != null) existingContrato.setStatus(contratoDetails.getStatus());
                     return contratoRepository.save(existingContrato);
                 });
     }
@@ -100,5 +83,19 @@ public class ContratoServiceImpl implements ContratoService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    @Transactional
+    public Contrato criarContrato(Responsaveis responsavel, Motoristas motorista, Crianca crianca) {
+        Contrato novoContrato = new Contrato();
+        novoContrato.setResponsavel(responsavel);
+        novoContrato.setMotorista(motorista);
+        novoContrato.setCrianca(crianca); // Descomente se tiver adicionado o campo na entidade
+        novoContrato.setDataInicio(LocalDate.now());
+        novoContrato.setDataFim(LocalDate.now().plusMonths(12));
+        novoContrato.setStatus("ATIVO");
+        novoContrato.setValorMensal(new BigDecimal("500.00"));
+        return contratoRepository.save(novoContrato);
     }
 }
