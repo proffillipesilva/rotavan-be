@@ -1426,3 +1426,20 @@ java.lang.RuntimeException: Escola com id e1a2b3c4-d5e6-f789-0123-456789abcdef n
 2025-11-28 19:21:42.212 [http-nio-5000-exec-6] INFO  b.e.f.R.c.LoggingAspect - >>>> Argumentos: []
 2025-11-28 19:21:42.272 [http-nio-5000-exec-6] INFO  b.e.f.R.c.LoggingAspect - <<<< Controller FIM: br.edu.fiec.RotaVan.features.user.controllers.EscolasController.getAllEscolas() - SUCESSO
 2025-11-28 19:22:02.424 [http-nio-5000-exec-5] INFO  b.e.f.R.c.f.JwtAuthenticationFilter - JwtAuthFilter - logging user here  org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@3aab1214
+2025-11-28 19:24:03.541 [http-nio-5000-exec-4] INFO  b.e.f.R.c.LoggingAspect - >>>> Controller INÍCIO: br.edu.fiec.RotaVan.features.auth.controllers.AuthController.registerResponsavel()
+2025-11-28 19:24:03.541 [http-nio-5000-exec-4] INFO  b.e.f.R.c.LoggingAspect - >>>> Argumentos: [RegisterRequest(nomeResponsavel=Maria da Silva, email=maria.silva@email.com, password=senhaforte123, cpfResponsavel=11122233344, enderecoCasa=Rua das Flores, 123, Bairro Feliz, Indaiatuba-SP, criancas=[CriancaRegisterDTO(nome=Enzo Gabriel da Silva, escolaId=1dc31e4b-3107-4f01-b684-e8512465029d, dataNascimento=2015-08-20, nivelEscolar=Ensino Fundamental I, endereco=Rua das Palmeiras, 456, Apto 12, tipoServico=IDA_E_VOLTA, periodo=MANHA, latitude=-23.1, longitude=-47.2)])]
+2025-11-28 19:24:03.542 [http-nio-5000-exec-4] INFO  b.e.f.R.f.a.c.AuthController - Recebida requisição para registar novo responsável com email: maria.silva@email.com
+2025-11-28 19:24:03.756 [http-nio-5000-exec-4] INFO  b.e.f.R.f.a.s.i.AuthenticationServiceImpl - Coordenadas obtidas para o responsável Maria da Silva: -15.763003, -49.3342278
+2025-11-28 19:24:03.857 [http-nio-5000-exec-4] INFO  b.e.f.R.f.a.c.AuthController - Responsável registado com sucesso para o email: maria.silva@email.com
+2025-11-28 19:24:03.858 [http-nio-5000-exec-4] INFO  b.e.f.R.c.LoggingAspect - <<<< Controller FIM: br.edu.fiec.RotaVan.features.auth.controllers.AuthController.registerResponsavel() - SUCESSO
+2025-11-28 19:32:18.538 [http-nio-5000-exec-9] INFO  b.e.f.R.c.LoggingAspect - >>>> Controller INÍCIO: br.edu.fiec.RotaVan.features.auth.controllers.AuthController.registerResponsavel()
+2025-11-28 19:32:18.538 [http-nio-5000-exec-9] INFO  b.e.f.R.c.LoggingAspect - >>>> Argumentos: [RegisterRequest(nomeResponsavel=Maria da Silva, email=mariasilva@email.com, password=senhaforte123, cpfResponsavel=11122233344, enderecoCasa=Rua sergio dos santos pereira, 55, criancas=[CriancaRegisterDTO(nome=Enzo Gabriel da Silva, escolaId=1dc31e4b-3107-4f01-b684-e8512465029d, dataNascimento=2015-08-20, nivelEscolar=Ensino Fundamental I, endereco=Rua das Palmeiras, 456, Apto 12, tipoServico=IDA_E_VOLTA, periodo=MANHA, latitude=-23.1, longitude=-47.2)])]
+2025-11-28 19:32:18.538 [http-nio-5000-exec-9] INFO  b.e.f.R.f.a.c.AuthController - Recebida requisição para registar novo responsável com email: mariasilva@email.com
+2025-11-28 19:32:18.925 [http-nio-5000-exec-9] INFO  b.e.f.R.f.a.s.i.AuthenticationServiceImpl - Coordenadas obtidas para o responsável Maria da Silva: -23.1100561, -47.2266534
+2025-11-28 19:32:19.003 [http-nio-5000-exec-9] INFO  b.e.f.R.f.a.c.AuthController - Responsável registado com sucesso para o email: mariasilva@email.com
+2025-11-28 19:32:19.003 [http-nio-5000-exec-9] INFO  b.e.f.R.c.LoggingAspect - <<<< Controller FIM: br.edu.fiec.RotaVan.features.auth.controllers.AuthController.registerResponsavel() - SUCESSO
+2025-11-28 22:31:47.055 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.t.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-11-28 22:31:47.065 [tomcat-shutdown] INFO  o.s.b.w.e.t.GracefulShutdown - Graceful shutdown complete
+2025-11-28 22:31:47.081 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-11-28 22:31:47.097 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-11-28 22:31:47.102 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.

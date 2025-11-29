@@ -46,7 +46,7 @@ public class Contrato {
     private Responsaveis responsavel;
 
     // Sugestão: Adicionar vínculo com a Criança também, se fizer sentido para o seu negócio
-    // @ManyToOne
-    // @JoinColumn(name = "fk_crianca")
-    // private Crianca crianca;
+    @ManyToOne
+    @JoinColumn(name = "fk_crianca")
+    private Crianca crianca;
 }

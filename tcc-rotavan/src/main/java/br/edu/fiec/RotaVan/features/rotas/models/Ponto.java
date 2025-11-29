@@ -24,6 +24,8 @@ public class Ponto {
     private Double latitude;
     private Double longitude;
 
+    private Integer ordem;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_rota") // Verifique se no seu banco é 'fk_rota' ou 'rota_id'
     @JsonIgnore
