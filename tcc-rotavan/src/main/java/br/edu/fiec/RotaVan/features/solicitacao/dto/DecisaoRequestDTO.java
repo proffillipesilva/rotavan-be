@@ -9,8 +9,13 @@ import lombok.Data;
 public class DecisaoRequestDTO {
 
     @Schema(description = "A decisão do motorista sobre a solicitação.",
-            example = "ACEITA", // Atualizado para bater com a lógica do Service
+            example = "ACEITA",
             allowableValues = {"ACEITA", "RECUSADA"},
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private String decisao; // <-- Renomeado de 'status' para 'decisao'
+    private String decisao;
+
+    // --- ADICIONE ESTE MÉTODO PARA CORRIGIR O ERRO ---
+    public boolean isAceito() {
+        return "ACEITA".equalsIgnoreCase(this.decisao) || "true".equalsIgnoreCase(this.decisao);
+    }
 }

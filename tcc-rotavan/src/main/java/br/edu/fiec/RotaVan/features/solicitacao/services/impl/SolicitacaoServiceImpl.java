@@ -1,8 +1,6 @@
 package br.edu.fiec.RotaVan.features.solicitacao.services.impl;
 
 import br.edu.fiec.RotaVan.features.contratos.services.ContratoService;
-import br.edu.fiec.RotaVan.features.firebase.dto.NotificationMessage; // <-- Importante: Importar o DTO
-import br.edu.fiec.RotaVan.features.firebase.services.NotificationService;
 import br.edu.fiec.RotaVan.features.rotas.models.Ponto;
 import br.edu.fiec.RotaVan.features.rotas.models.Rota;
 import br.edu.fiec.RotaVan.features.rotas.repositories.PontoRepository;
@@ -13,25 +11,25 @@ import br.edu.fiec.RotaVan.features.solicitacao.models.Solicitacao;
 import br.edu.fiec.RotaVan.features.solicitacao.repositories.SolicitacaoRepository;
 import br.edu.fiec.RotaVan.features.solicitacao.services.SolicitacaoService;
 import br.edu.fiec.RotaVan.features.user.models.Crianca;
+import br.edu.fiec.RotaVan.features.user.models.Escolas;
 import br.edu.fiec.RotaVan.features.user.models.Motoristas;
 import br.edu.fiec.RotaVan.features.user.models.Responsaveis;
 import br.edu.fiec.RotaVan.features.user.repositories.CriancaRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.EscolasRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.MotoristasRepository;
 import br.edu.fiec.RotaVan.features.user.repositories.ResponsaveisRepository;
-import br.edu.fiec.RotaVan.features.veiculos.repositories.VeiculoRepository;
+import br.edu.fiec.RotaVan.shared.dto.ResultadoOtimizadoDTO;
 import br.edu.fiec.RotaVan.shared.service.GoogleMapsService;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class SolicitacaoServiceImpl implements SolicitacaoService {
 
     private static final Logger log = LoggerFactory.getLogger(SolicitacaoServiceImpl.class);
@@ -41,22 +39,52 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
     private final MotoristasRepository motoristaRepository;
     private final CriancaRepository criancaRepository;
     private final EscolasRepository escolaRepository;
-    private final GoogleMapsService googleMapsService;
+    private final ContratoService contratoService;
     private final RotaRepository rotaRepository;
     private final PontoRepository pontoRepository;
-    private final VeiculoRepository veiculoRepository;
-    private final ContratoService contratoService;
-    private final NotificationService notificationService;
+    private final GoogleMapsService googleMapsService;
+
+    public SolicitacaoServiceImpl(
+            SolicitacaoRepository solicitacaoRepository,
+            ResponsaveisRepository responsavelRepository,
+            MotoristasRepository motoristaRepository,
+            CriancaRepository criancaRepository,
+            EscolasRepository escolaRepository,
+            ContratoService contratoService,
+            RotaRepository rotaRepository,
+            PontoRepository pontoRepository,
+            GoogleMapsService googleMapsService) {
+        this.solicitacaoRepository = solicitacaoRepository;
+        this.responsavelRepository = responsavelRepository;
+        this.motoristaRepository = motoristaRepository;
+        this.criancaRepository = criancaRepository;
+        this.escolaRepository = escolaRepository;
+        this.contratoService = contratoService;
+        this.rotaRepository = rotaRepository;
+        this.pontoRepository = pontoRepository;
+        this.googleMapsService = googleMapsService;
+    }
 
     @Override
+    public List<Solicitacao> listarTodas() {
+        return solicitacaoRepository.findAll();
+    }
+
+    @Override
+    public Optional<Solicitacao> findById(UUID id) {
+        return solicitacaoRepository.findById(id);
+    }
+
+    @Override
+    @Transactional
     public Solicitacao criarSolicitacaoEGerarRotas(SolicitacaoRequestDTO request) {
-        var responsavel = responsavelRepository.findById(request.getResponsavelId())
+        Responsaveis responsavel = responsavelRepository.findById(request.getResponsavelId())
                 .orElseThrow(() -> new RuntimeException("Responsável não encontrado"));
-        var motorista = motoristaRepository.findById(request.getMotoristaId())
+        Motoristas motorista = motoristaRepository.findById(request.getMotoristaId())
                 .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
-        var crianca = criancaRepository.findById(request.getCriancaId())
+        Crianca crianca = criancaRepository.findById(request.getCriancaId())
                 .orElseThrow(() -> new RuntimeException("Criança não encontrada"));
-        var escola = escolaRepository.findById(request.getEscolaId())
+        Escolas escola = escolaRepository.findById(request.getEscolaId())
                 .orElseThrow(() -> new RuntimeException("Escola não encontrada"));
 
         Solicitacao solicitacao = new Solicitacao();
@@ -68,87 +96,91 @@ public class SolicitacaoServiceImpl implements SolicitacaoService {
 
         solicitacao = solicitacaoRepository.save(solicitacao);
 
-        // Lógica de rotas sugeridas aqui...
+        try {
+            // Tenta obter o endereço do motorista, usa padrão se for nulo
+            String origem = (motorista.getUser().getEndereco() != null) ? motorista.getUser().getEndereco() : "Indaiatuba, SP";
+            String destino = escola.getEndereco();
+            List<String> paradas = List.of(crianca.getEndereco());
 
-        return solicitacaoRepository.save(solicitacao);
+            if (origem != null && destino != null) {
+                ResultadoOtimizadoDTO resultadoOtimizado = googleMapsService.otimizarRota(origem, destino, paradas);
+
+                if (resultadoOtimizado != null) {
+                    Rota rotaSugerida = new Rota();
+                    rotaSugerida.setNome("Rota Sugerida - " + crianca.getNome());
+
+                    // --- CORREÇÃO AQUI (Nomes dos métodos setters) ---
+                    rotaSugerida.setDistancia(resultadoOtimizado.getDistanciaKm());
+                    rotaSugerida.setTempoEstimado(resultadoOtimizado.getTempoMin());
+                    // -------------------------------------------------
+
+                    rotaSugerida.setTipo("SUGERIDA");
+                    rotaSugerida.setSolicitacao(solicitacao);
+
+                    rotaSugerida = rotaRepository.save(rotaSugerida);
+
+                    for (Ponto pontoDTO : resultadoOtimizado.getPontosOrdenados()) {
+                        Ponto ponto = new Ponto();
+                        ponto.setEndereco(pontoDTO.getEndereco());
+                        ponto.setLatitude(pontoDTO.getLatitude());
+                        ponto.setLongitude(pontoDTO.getLongitude());
+                        ponto.setOrdem(pontoDTO.getOrdem());
+                        ponto.setNome(pontoDTO.getNome());
+                        ponto.setRota(rotaSugerida);
+
+                        pontoRepository.save(ponto);
+                    }
+                    log.info("Rota sugerida criada com sucesso para a solicitação {}", solicitacao.getId());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Erro ao gerar rota sugerida: " + e.getMessage());
+        }
+
+        return solicitacao;
     }
 
     @Override
-    public Optional<Solicitacao> findById(UUID id) {
-        return solicitacaoRepository.findById(id);
-    }
-
-    @Override
+    @Transactional
     public Solicitacao decidirSolicitacao(UUID solicitacaoId, DecisaoRequestDTO decisao) {
         Solicitacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
                 .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
 
-        Motoristas motorista = solicitacao.getMotorista();
-        Responsaveis responsavel = solicitacao.getResponsavel();
-        Crianca crianca = solicitacao.getCrianca();
+        if (!"PENDENTE".equalsIgnoreCase(solicitacao.getStatus())) {
+            throw new IllegalStateException("Esta solicitação já foi respondida.");
+        }
 
-        if ("ACEITA".equals(decisao.getDecisao())) {
-            solicitacao.setStatus("ACEITA");
+        String novoStatus = decisao.isAceito() ? "ACEITA" : "RECUSADA";
+        solicitacao.setStatus(novoStatus);
 
-            if (solicitacao.getRotasSugeridas() != null) {
-                for (Rota rotaSugerida : solicitacao.getRotasSugeridas()) {
-                    rotaSugerida.setTipo("OFICIAL");
-                    rotaRepository.save(rotaSugerida);
-
-                    if (rotaSugerida.getPontos() != null) {
-                        for (Ponto ponto : rotaSugerida.getPontos()) {
-                            ponto.setRota(rotaSugerida);
-                            pontoRepository.save(ponto);
-                        }
-                    }
-                }
-            }
-
-            // Criar Contrato
-            contratoService.criarContrato(responsavel, motorista, crianca);
-
-            // --- CORREÇÃO 1: Construir o objeto NotificationMessage ---
-            // --- CORREÇÃO 2: Usar responsavel.getUser().getId() ---
-            // --- CORREÇÃO 3: Usar motorista.getNomeMotorista() ---
-            enviarNotificacaoSegura(
-                    responsavel.getUser().getId(), // ID do USER, não do Responsável
-                    "Solicitação Aceita!",
-                    "O motorista " + motorista.getNomeMotorista() + " aceitou o transporte."
+        if (decisao.isAceito()) {
+            contratoService.criarContrato(
+                    solicitacao.getResponsavel(),
+                    solicitacao.getMotorista(),
+                    solicitacao.getCrianca()
             );
-
-        } else if ("RECUSADA".equals(decisao.getDecisao())) {
-            solicitacao.setStatus("RECUSADA");
-
-            enviarNotificacaoSegura(
-                    responsavel.getUser().getId(), // ID do USER, não do Responsável
-                    "Solicitação Recusada",
-                    "O motorista não pode aceitar o transporte neste momento."
-            );
-        } else {
-            throw new IllegalArgumentException("Decisão inválida. Use ACEITA ou RECUSADA.");
         }
 
         return solicitacaoRepository.save(solicitacao);
     }
 
-    @Override
-    public List<Solicitacao> listarTodas() {
-        return solicitacaoRepository.findAll();
+    public List<Solicitacao> listarPorStatus(String status) {
+        return solicitacaoRepository.findByStatus(status);
     }
 
+    public List<Solicitacao> listarPorMotorista(UUID motoristaId) {
+        return solicitacaoRepository.findByMotoristaId(motoristaId);
+    }
 
-    private void enviarNotificacaoSegura(UUID userId, String titulo, String mensagem) {
-        try {
-            NotificationMessage msg = NotificationMessage.builder()
-                    .userId(userId.toString())
-                    .title(titulo)
-                    .message(mensagem)
-                    .build();
+    public List<Solicitacao> listarPorResponsavel(UUID responsavelId) {
+        return solicitacaoRepository.findByResponsavelId(responsavelId);
+    }
 
-            notificationService.sendNotificationToUser(msg);
-        } catch (Exception e) {
-            // Apenas loga o erro, não impede a solicitação de ser salva
-            log.error("Falha ao enviar notificação para o usuário {}: {}", userId, e.getMessage());
+    public boolean deleteById(UUID id) {
+        if (solicitacaoRepository.existsById(id)) {
+            solicitacaoRepository.deleteById(id);
+            return true;
         }
+        return false;
     }
 }
